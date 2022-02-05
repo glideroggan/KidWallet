@@ -1,0 +1,202 @@
+﻿@page "/CreateTask"
+@inherits CreateTaskBase
+@using server.Shared.Components
+
+<h2>Create new task</h2>
+
+@if (initialized)
+{
+	<div>
+		<div class="input-group mb-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text" id="description">Description</span>
+			</div>
+			<input class="form-control" placeholder="Diska" id="description" type="string" max="20" 
+			       @bind="@Description"
+			       @onblur="@OnChangeDescription"
+				aria-describedby="description"/>
+	@*TODO: have some FE field telling when going over the limit*@
+		</div>
+
+		<div class="input-group mb-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">Payout</span>
+			</div>
+			<input class="form-control" id="payout" type="number" min="1" 
+			       @bind="@Payout"
+			       @onblur="@OnChangePayout"/>
+		</div>
+		
+		<MyDropdown TItem="string" OnSelected="@OnSelected">
+			<InitialTip>Dropdown</InitialTip>
+			<ChildContent>
+				@foreach (var image in images)
+				{
+					<MyDropdownListItem Item="@image">@image</MyDropdownListItem>
+				}
+			</ChildContent>
+		</MyDropdown>
+		
+		<div class="part2">
+			<div>
+				<div>For who?</div>
+				<div class="input-group mb-3">
+					@foreach (var childName in children)
+					{
+						<div class="input-group-prepend mx-2">
+							<div class="input-group-text">
+								<input id="@childName" name="who"
+								       @onchange="WhoChanged"
+								       checked="@(childName == children[^1])" type="radio" value="@childName" />
+								<div class="input-group-text p-0 ms-2">@childName</div>
+							</div>
+						</div>
+					}
+				</div>
+				<div>When?</div>
+				<div class="input-group">
+					<div class="input-group-prepend mx-2">
+						<div class="input-group-text">
+							<input type="radio" id="weekly" checked name="when-type" value="Weekly"  @onchange="WhenChanged" />
+							<span class="input-group-text p-0 ms-2">Weekly</span>
+						</div>
+					</div>
+					<div class="input-group-prepend">
+						<div class="input-group-text">
+							<input type="radio" id="dayily" name="when-type" value="Day" @onchange="WhenChanged" />
+							<span class="input-group-text p-0 ms-2">Daily</span>
+						</div>
+					</div>
+				</div>
+				@if (Daily)
+                {
+                    <div class="input-group">
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="monday" name="days" value="Monday" @bind="monday"/>
+                            	<span class="input-group-text p-0 ms-2">Monday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="tuesday" name="days" value="Tuesday" @bind="tuesday"/>
+                            	<span class="input-group-text p-0 ms-2">Tuesday</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="wednesday" name="days" value="Wednesday" @bind="wednesday"/>
+                            	<span class="input-group-text p-0 ms-2">Wednesday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="thursday" name="days" value="Thursday" @bind="thursday"/>
+                            	<span class="input-group-text p-0 ms-2">Thursday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="friday" name="days" value="Friday" @bind="friday"/>
+                            	<span class="input-group-text p-0 ms-2">Friday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="saturday" name="days" value="Saturday" @bind="saturday"/>
+                            	<span class="input-group-text p-0 ms-2">Saturday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+                            	<input type="checkbox" id="sunday" name="days" value="Sunday" @bind="sunday"/>
+                            	<span class="input-group-text p-0 ms-2">Sunday</span>
+                            </div>
+                        </div>
+        
+                    </div>	
+                }
+				else
+				{
+					<div class="input-group">
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="monday" name="days-type" value="Monday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Monday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="tuesday" name="days-type" value="Tuesday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Tuesday</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="wednesday" name="days-type" value="Wednesday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Wednesday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="thursday" name="days-type" value="Thursday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Thursday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="friday" name="days-type" value="Friday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Friday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="saturday" name="days-type" value="Saturday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Saturday</span>
+                            </div>
+                        </div>
+        
+                        <div class="input-group-prepend m-2">
+                            <div class="input-group-text">
+	                            <input type="radio" id="sunday" name="days-type" value="Sunday" 
+	                                   @onchange="WeekDayChanged"/>
+                            	<span class="input-group-text p-0 ms-2">Sunday</span>
+                            </div>
+                        </div>
+        
+                    </div>
+				}
+			</div>
+			
+			<div class="d-flex">
+            	@* TODO: Make this work as a preview  *@
+            	<WorkTask Data="@CardModel"/>
+            </div>
+		</div>
+
+		
+		
+		
+		
+
+		<button class="btn-primary" @onclick="CreateTaskAsync">Create</button>
+	</div>
+}
+

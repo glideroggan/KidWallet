@@ -1,0 +1,36 @@
+﻿@page "/"
+@inherits IndexBase;
+@using server.Pages;
+@using server.Components;
+
+
+<PageTitle>Index</PageTitle>
+
+@if (State.User == null)
+{
+	// TODO: wouldn't it be better to just be redirected to a login page?
+	<LoginModule Successful="() => UpdateStateAsync()"/>
+} else {
+	<div class="container mx-1">
+		<div class="left-side">
+			<div>
+			<UserCard Model="State.User" />
+		</div>
+		@foreach (var child in Children)
+		{
+			<div>
+				<UserCard Model="child" />
+			</div>
+		}
+		</div>
+
+		<div class="right-side">
+			<server.Components.Widgets.PotentialEarnings Role="State.User.Role"/>
+			<server.Components.Widgets.EarningsLosses Role="State.User.Role" />
+		</div>
+		
+	</div>
+}
+
+
+

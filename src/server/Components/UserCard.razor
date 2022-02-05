@@ -1,0 +1,40 @@
+﻿@using server.Data.User;
+@inherits UserCardBase
+
+<div class="card-container border d-inline-flex shadow-lg border-1 border-secondary">
+    <div class="part1 border-end border-secondary">
+        <div class="card-image-container">
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid">
+        </div>
+    </div>
+
+    <div class="part2 mx-2">
+        <div class="upper d-flex flex-column">
+            <div id="name" class="mt-1">@Model.Name</div>
+            <div class="info">
+                @Model.Role.ToString()
+            </div>
+        </div>
+
+        <div class="lower align-self-end d-flex ">
+            <div class="icons-container  d-flex flex-row mx-auto justify-content-between">
+                <div class="icon mx-3"
+                     @onclick="@(() => PayingOrTransferring(Model.Name))">
+                    <div>Money</div>
+                    <svg class="bi" style="color:#a2708a;" width="32" height="32" fill="currentColor">
+                        <use xlink:href="/assets/bootstrap-icons/bootstrap-icons.svg#cash" />
+                    </svg>
+                    <div>@Model.Balance</div>
+                </div>
+                <div class="icon mx-3">
+                    <div>Bank</div>
+                    <svg class="bi" style="color:#a2708a;" width="32" height="32" fill="currentColor">
+                        <use xlink:href="/assets/bootstrap-icons/bootstrap-icons.svg#piggy-bank-fill" />
+                    </svg>
+                    <div>@Banked</div>
+                </div>
+                <div class="tasks"></div>
+            </div>
+        </div>
+    </div>
+</div>

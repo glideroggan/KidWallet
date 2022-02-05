@@ -1,0 +1,13 @@
+﻿@namespace server.Shared.Components
+@typeparam TItem
+<a class="dropdown-item" Item="@Item" @onclick="e=> Dropdown.HandleSelect(Item, ChildContent)" >@ChildContent(Item)</a>
+
+@code {
+    [CascadingParameter(Name="Dropdown")]
+    public MyDropdown<TItem> Dropdown {get;set;}
+
+    [Parameter]
+    public TItem Item{get;set;}
+    [Parameter]
+    public RenderFragment<TItem> ChildContent {get;set;}
+}

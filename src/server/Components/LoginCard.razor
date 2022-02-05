@@ -1,0 +1,23 @@
+﻿@inherits LoginCardBase
+
+<div class="card-container" @onclick:stopPropagation="true" onclick="@Login"
+     @onclick:preventDefault="true">
+	<div class="part1">
+		<div>@User.Username</div>
+		<div>
+			<img src="@User.ImageUrl" alt="@User.Username" class="img-fluid card-image-container">
+		</div>
+	</div>
+	<div class="part2" @onclick:preventDefault="true">
+		@if (PasswordNeeded)
+		{
+			<input class="form-control" 
+			       type="password" @bind="Password" placeholder="password" @onkeyup="KeyboardHandler" />
+			<button class="btn-primary" @onclick="@LoginButton">Login</button>
+		}
+	</div>
+</div>
+
+
+
+

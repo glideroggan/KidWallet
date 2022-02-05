@@ -1,0 +1,19 @@
+#alert {
+    transition: height 1s;
+}
+
+.hidden {
+    padding:0;
+    margin-bottom: 0;
+    border: 0;
+    height: 0px;
+}
+
+.shown {
+    height: 50px;
+}
+
+.part2 {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}

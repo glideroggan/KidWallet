@@ -1,0 +1,69 @@
+﻿@page "/Transfer/{name}"
+@inherits TransferBase
+
+<h3>Transfer</h3>
+
+<div class="input-group-prepend mx-2">
+    <div class="input-group-text d-inline-flex">
+        <input type="radio" 
+               id="payfor" 
+               name="transfer-type"
+               @onchange="TransferTypeChanged"
+               value="Pay" />
+        <div class="input-group-text p-0 ms-2">Betala för</div>
+    </div>
+    <div class="input-group-text d-inline-flex">
+        <input type="radio" 
+               id="transfer" 
+               name="transfer-type"
+               @onchange="TransferTypeChanged"
+               value="Transfer" />
+        <div class="input-group-text p-0 ms-2">Överföring</div>
+    </div>
+</div>
+
+@if (TransferType == TransferTypeEnum.Pay)
+{
+	<div class="input-group-prepend mx-2">
+		@foreach (var child in children)
+		{
+			<div class="input-group-text d-inline-flex">
+				<input type="radio"
+				       id="@child.Name"
+				       name="which-child"
+				       @onchange="ChildChanged"
+				       value="@child.Name"/>
+				<div class="input-group-text p-0 ms-2">@child.Name</div>
+			</div>	
+		}
+	</div>
+	@*TODO: what is a better way to check if we have a value when using records? *@  
+	@if (ModelPage.Child?.Name.Length > 1)
+	{
+		<div>
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="description">Sak</span>
+				</div>
+				<input class="form-control" placeholder="Godis" id="description" type="string" max="20" 
+				       @bind="@PayModel.Description"
+				       aria-describedby="description"/>
+			</div>
+        
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="money">Pengar</span>
+				</div>
+				<input class="form-control" type="number" 
+				       min="1"
+				       max="@ModelPage.Child.Balance"
+				       aria-describedby="money"
+				       @bind="@ModelPage.Cost"/>
+				<div class="input-group-append">
+					<span class="input-group-text">@ModelPage.Child.Balance SEK</span>
+				</div>
+			</div>
+		</div>	
+	}
+}
+<button class="btn-primary btn" @onclick="@DoTransfer">Send</button>

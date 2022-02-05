@@ -1,0 +1,18 @@
+﻿@namespace server.Components.Widgets
+@inherits PotentialEarningsBase
+
+@if (Role == Data.User.RoleEnum.Parent)
+{
+<div class="card border mx-2 mb-2 shadow-lg border-1 border-secondary">
+	<span>Potential earnings today</span>
+	<div class="table">
+		@foreach (var child in children)
+		{
+			<span class="name">@child.Name</span>
+			<span class="val">@($"{child.CanEarnToday} SEK")</span>
+		}
+	</div>
+</div>	
+}
+
+

@@ -1,0 +1,31 @@
+﻿using Microsoft.AspNetCore.Components;
+using server.Data.User;
+
+namespace server.Components;
+
+public class UserCardBase : ComponentBase
+{
+    [Inject] public AppState State { get; set; } = null!;
+    [Inject] protected NavigationManager Nav { get; set; }
+    [Parameter] public UserModel Model { get; set; } = null!;
+    [Parameter] public int Banked { get; set; }
+    
+
+    // TODO: add callback when clicking transfer money method
+
+    protected bool CanTransferMoney() => State.User?.Role == RoleEnum.Parent && Model.Role == RoleEnum.Child;
+
+    protected Task PayingOrTransferring(string name)
+    {
+        switch (State.User.Role)
+        {
+            case RoleEnum.Child when Model.Id == State.User.Id:
+                Nav.NavigateTo("/pay");
+                break;
+            case RoleEnum.Parent when Model.Role == RoleEnum.Child:
+                Nav.NavigateTo($"/transfer/{name}");
+                break;
+        }
+        return Task.CompletedTask;
+    }
+}

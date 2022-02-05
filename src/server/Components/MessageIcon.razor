@@ -1,0 +1,12 @@
+﻿@inherits MessagesBase
+
+<div class="icon-wrap d-flex"
+     onclick="@(async () => await OnClickAsync())"
+    @onclick:stopPropagation="true">
+    <svg class="bi" style="color:White;" width="32" height="32" fill="currentColor">
+        <use href="@GetMessageIcon()"/>
+    </svg>
+</div>
+
+
+

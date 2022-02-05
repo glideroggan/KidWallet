@@ -1,0 +1,12 @@
+﻿@media (min-width: 641px) {
+	.container {
+		display:grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		/*grid-auto-flow:column;*/
+	}
+}
+
+
+@media (max-width: 640.98px) {
+
+}

@@ -1,0 +1,15 @@
+﻿{
+  "background_color": "purple",
+  "description": "KidWallet",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "name": "Kid-Wallet",
+  "short_name": "KidWallet",
+  "start_url": "./"
+}

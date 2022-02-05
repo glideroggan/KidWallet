@@ -1,0 +1,19 @@
+﻿@page "/tasks"
+@inherits TasksBase;
+
+@if (Tasks == null)
+{
+	<p>TODO: loading</p>
+} else
+{
+	<div class="d-inline-flex flex-row flex-wrap">
+		@foreach (var model in Tasks)
+		{
+			<WorkTask Data="model" 
+			          OnChange="@(async () => await ChildUpdate())"/>
+		}
+	</div>	
+	
+}
+
+

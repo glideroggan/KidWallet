@@ -1,0 +1,99 @@
+﻿svg {
+    padding: 0;
+    margin: 0;
+}
+
+.card-container {
+    background-color: #bad29f;
+    text-align: left;
+    justify-content: left;
+    /*margin-left: auto;
+    margin-right: auto;*/
+    /*margin-bottom: 60px;*/
+    /*max-width: 50%;*/
+    /*min-width: 400px;*/
+    min-height: 200px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.card-image-container {
+    width: 150px;
+    height: 150px;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+}
+
+.part2 {
+    width: 100%;
+    min-height:100%;
+}
+
+#name {
+    text-align: center;
+    font-family: 'Baskerville Old Face';
+    font-size:1.5rem;
+    font-weight: bold;
+}
+
+.info {
+    font-family: 'Baskerville Old Face';
+}
+
+.upper {
+    height: 50%;
+}
+
+.lower {
+    height: 50%;
+}
+
+.icons-container {
+    align-self:end;
+    /*align-self: end;*/
+    /*position:absolute;*/
+    /*bottom: 0;*/
+    /*width: 100%;*/
+    /*height: 25%;*/
+}
+
+.icon {
+    text-align: center;
+}
+
+.icon > div:first-of-type {
+    margin-bottom: -10px;
+}
+
+.icon > div:last-child {
+    margin-top: -10px;
+}
+
+.spending-account {
+    /*text-align: left;*/
+}
+
+#balance {
+    /*position:relative;*/
+    /*left: 50%;*/
+    font-weight: bolder;
+    font-size: larger;
+    margin-top: 5px;
+    margin-bottom: -15px;
+    text-align: center;
+}
+
+.card-info {
+    height: 30%;
+}
+
+.name {
+    font-size: 2rem;
+}
+
+.role {
+    font-size: 1rem;
+}

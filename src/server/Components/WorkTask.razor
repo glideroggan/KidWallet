@@ -1,0 +1,61 @@
+﻿@inherits WorkTaskBase;
+
+@if (Waiting)
+{
+    <div class="card-container">
+        <div class="lds-dual-ring"></div>
+    </div>
+}
+else
+{
+<div id="card-background">
+    <span id="owner">@(Data.TargetUser == null ? "Alla" : Data.TargetUser.Name)</span>
+    <div id="card" class="text-center position-relative" onclick="@ClickedCard">
+        <div id="money">
+            @Data.Payout
+            @*<Components.Money Amount="@Data.Payout" ImgUrl="/assets/money.png" />*@
+        </div>
+        <div class="card-image-container">
+            <img src="@Data.ImageUrl" />
+        </div>
+        
+        <h2 class="text-uppercase card-text">
+            @Data.Description
+        </h2>
+        @if (Data.NotBefore > DateTime.Now)
+        {
+            <div class="ribbon red"><span>Not Active</span></div>
+        }
+        else if  (Data.User != null)
+        {
+            <div class="ribbon"><span>@Data.User.Name</span></div>
+        }
+        
+
+        <div class="icons-container d-flex flex-row justify-content-around align-items-end">
+            <div class="icon-wrap d-flex"
+                onclick="@OnDoneAndApprove"
+                @onclick:stopPropagation="true">
+                <svg class="bi" style="color:green;" width="32" height="32" fill="currentColor">
+                    <use href="@GetApproveAndDoneButtonIcon()" />
+                </svg>
+            </div>
+            <div class="icon-wrap d-flex"
+                onclick="@OnDisapprove"
+                @onclick:stopPropagation="true">
+                <svg class="bi" style="color:red;" width="32" height="32" fill="currentColor">
+                    <use href="@GetApproveButtonIconDenied()" />
+                </svg>
+            </div>
+            <div class="icon-wrap d-flex"
+                onclick="@(async () => await OnRemoveTask())"
+                @onclick:stopPropagation="true">
+                <svg class="bi" style="color:black;" width="32" height="32" fill="currentColor">
+                    <use href="@CanWeTrashIt()" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>    
+}
+

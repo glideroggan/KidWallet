@@ -1,0 +1,16 @@
+﻿@inherits TopMenuContextOptionsBase
+
+<div>
+    @if (Links != null)
+    {
+        @foreach (var subpage in Links)
+        {
+            <svg class="bi" style="color:White;" width="32" height="32" fill="currentColor"
+                 @onclick="@(() => NavManager.NavigateTo(subpage.Url))">
+                <use href="@subpage.Icon"/>
+            </svg>
+            @*<a href="@subpage.Url" target="_self">@subpage.Icon</a>*@    
+        }
+    }
+</div>
+

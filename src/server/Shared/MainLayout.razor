@@ -1,0 +1,34 @@
+﻿@inherits MainLayoutBase
+
+<PageTitle>server</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <TopMenuContextOptions />
+            @if (State.User != null)
+            {
+                <span class="ps-4"><MessageIcon User="State.User"/></span>
+                <span class="ps-4" @onclick="@Logout">
+                    <svg class="bi" style="color:White;" width="32" height="32" fill="currentColor">
+                        <use href="/assets/bootstrap-icons/bootstrap-icons.svg#door-open-fill"/>
+                    </svg>
+                </span>
+                @*<a href="/" target="_self" onclick="@Logout">Logout</a>*@
+            }
+
+        </div>
+
+        <Notification Message="@Message" OnDone="() => Message = null" />
+        <CascadingValue Value="NotificationCallback">
+            <article class="content px-4">
+                @Body
+            </article>
+        </CascadingValue>
+    </main>
+</div>
+

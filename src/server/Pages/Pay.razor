@@ -1,0 +1,33 @@
+﻿@page "/Pay"
+@inherits PayBase
+
+<h3>Pay</h3>
+
+Vad vill du köpa?
+<div class="input-group mb-3">
+	<div class="input-group-prepend">
+		<span class="input-group-text" id="description">Sak</span>
+	</div>
+	<input class="form-control" placeholder="Godis" id="description" type="string" max="20" 
+		@bind="@Description"
+		aria-describedby="description"/>
+</div>
+
+Hur mycket pengar?
+<div class="input-group mb-3">
+	<div class="input-group-prepend">
+		<span class="input-group-text" id="money">Pengar</span>
+	</div>
+	<input class="form-control" type="number" 
+		min="1"
+		max="@Balance"
+		aria-describedby="money"
+		@bind="@Cost"/>
+	<div class="input-group-append">
+		<span class="input-group-text">@Balance SEK</span>
+	</div>
+</div>
+
+<button class="btn btn-primary"
+        @onclick="Send">Skicka</button>
+

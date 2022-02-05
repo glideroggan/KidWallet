@@ -1,0 +1,22 @@
+﻿.card {
+	background-color: #bad29f;
+    text-align: left;
+    padding: 5px;
+    justify-content: left;
+    /*min-height: 200px;*/
+    overflow: hidden;
+    border-radius: 10px;
+    font-family: 'Baskerville Old Face';
+    font-size:1.5rem;
+}
+
+.table {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.name {
+}
+.val {
+    text-align:right;
+}
