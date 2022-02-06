@@ -20,6 +20,7 @@ namespace server.Services;
 /*
  * [BUG] - remove clean room for all
  * [BUG] - the once bool wasn't honored when task was approved
+ * [BUG] - tasks are returned that are already reserved by other child, continue here
  * [DONE] - When updating from db, it can sometimes be a bit slow and it doesn't look right when deleting tasks
  *      We can test this by slowing down the connection and try deleting some tasks
  */
@@ -140,7 +141,6 @@ public class TaskService
                     Description = taskDto.Description,
                     ImgUrl = taskDto.ImgUrl,
                     Payout = taskDto.Payout,
-                    UserId = taskDto.UserId,
                     Status = StatusEnum.Available,
                     Week = taskDto.Week,
                     EveryOtherWeek = taskDto.EveryOtherWeek,
@@ -148,7 +148,7 @@ public class TaskService
                     NotBefore = date,
                     Created = date,
                 };
-                _repo.Add(dbContext, newTaskDto);
+                TaskActions.CreateTask(dbContext, _repo, newTaskDto);
             }
 
             // remove old task
@@ -388,4 +388,15 @@ public static class DayAndWeekHelper
         var days = Enum.GetValues(typeof(DaysEnum)).Cast<uint>();
         return days.Count(x => ((uint)selectedDays & x) != 0);
     }
+}
+
+public static class TaskActions
+{
+    public static void CreateTask(WalletContext dbContext, IRepo<TaskDto> repo, TaskDto model)
+    {
+        // put validations here
+        if (model.UserId != null) throw new ArgumentException("Don't create task with an attached user");
+        
+        repo.Add(dbContext, model);
+    }   
 }
