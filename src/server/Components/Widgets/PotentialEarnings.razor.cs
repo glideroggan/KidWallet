@@ -23,11 +23,10 @@ public class PotentialEarningsBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        // TODO: if not logged in, throw error? Show something else?
         // get kids
         var kidsTask = UserService.GetChildrenAsync(State.User.Id);
         // get tasks
-        var tasks = await TaskService.GetTasksAsync(x => true);
+        var tasks = await TaskService.GetTasksAsync(x => x.NotBefore < DateTime.UtcNow);
         // foreach kid, filter correct tasks
         var kids = await kidsTask;
         children = kids.Select(x => (x.Name, 0)).ToList();
