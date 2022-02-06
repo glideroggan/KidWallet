@@ -1,0 +1,19 @@
+﻿@namespace server.Shared.Components
+
+<label class="input-group-text d-inline-flex">
+	<input type="radio" name="select" id="option-1"
+            value="@Item"
+            @onchange="RadioGroup.HandleSelect">
+	<div class="input-group-text p-0 ms-2 border-0">@ChildContent</div>
+</label>
+
+
+@code {
+	[CascadingParameter(Name = "RadioGroup")]
+	public MyRadioButton RadioGroup { get; set; }
+
+	[Parameter] public string Item { get; set; }
+
+	[Parameter] public RenderFragment ChildContent { get; set; }
+
+}

@@ -6,6 +6,7 @@ namespace server.Components.Widgets;
 
 /*
  * [TODO] - make this available on kids home page also, but just showing for her/him
+ * [BUG] - Does this really update when other tasks have been completed? or does it count inactive?
  */
 
 public class PotentialEarningsBase : ComponentBase

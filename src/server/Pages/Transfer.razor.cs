@@ -32,10 +32,10 @@ public class TransferBase : PageBase
         Transfer, Pay
     }
 
-    protected void ChildChanged(ChangeEventArgs args)
+    protected void ChildChanged(string val)
     {
         ModelPage.Child = children
-            .First(x => string.Equals(x.Name, args.Value.ToString(), StringComparison.InvariantCulture));
+            .First(x => string.Equals(x.Name, val, StringComparison.InvariantCulture));
         StateHasChanged();
     }
 
@@ -51,9 +51,9 @@ public class TransferBase : PageBase
         // TODO: if we get name from page, we should already check that radio input
     }
 
-    protected void TransferTypeChanged(ChangeEventArgs args)
+    protected void TransferTypeChanged(string val)
     {
-        TransferType = Enum.Parse<TransferTypeEnum>(args.Value.ToString());
+        TransferType = Enum.Parse<TransferTypeEnum>(val);
     }
 
     protected async Task DoTransfer()

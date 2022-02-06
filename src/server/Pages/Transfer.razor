@@ -1,42 +1,22 @@
 ﻿@page "/Transfer/{name}"
+@using server.Shared.Components
 @inherits TransferBase
 
 <h3>Transfer</h3>
 
-<div class="input-group-prepend mx-2">
-    <div class="input-group-text d-inline-flex">
-        <input type="radio" 
-               id="payfor" 
-               name="transfer-type"
-               @onchange="TransferTypeChanged"
-               value="Pay" />
-        <div class="input-group-text p-0 ms-2">Betala för</div>
-    </div>
-    <div class="input-group-text d-inline-flex">
-        <input type="radio" 
-               id="transfer" 
-               name="transfer-type"
-               @onchange="TransferTypeChanged"
-               value="Transfer" />
-        <div class="input-group-text p-0 ms-2">Överföring</div>
-    </div>
-</div>
+<MyRadioButton OnSelected="TransferTypeChanged">
+	<RadioButtonOptionItem Item="Pay">Betala för</RadioButtonOptionItem>
+	<RadioButtonOptionItem Item="Transfer">Överföring</RadioButtonOptionItem>
+</MyRadioButton>
 
 @if (TransferType == TransferTypeEnum.Pay)
 {
-	<div class="input-group-prepend mx-2">
+	<MyRadioButton OnSelected="ChildChanged">
 		@foreach (var child in children)
 		{
-			<div class="input-group-text d-inline-flex">
-				<input type="radio"
-				       id="@child.Name"
-				       name="which-child"
-				       @onchange="ChildChanged"
-				       value="@child.Name"/>
-				<div class="input-group-text p-0 ms-2">@child.Name</div>
-			</div>	
+			<RadioButtonOptionItem Item="@child.Name">@child.Name</RadioButtonOptionItem>
 		}
-	</div>
+	</MyRadioButton>
 	@*TODO: what is a better way to check if we have a value when using records? *@  
 	@if (ModelPage.Child?.Name.Length > 1)
 	{
