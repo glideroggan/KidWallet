@@ -10,6 +10,7 @@ using System.Text;
 using server.Data;
 using server.Extensions;
 using server.Services.Exceptions;
+using server.Services.Models;
 
 [assembly: InternalsVisibleTo("tests")]
 namespace server.Services;
@@ -81,22 +82,11 @@ public class TaskService
         taskDto.Status = StatusEnum.WaitingForApproval;
         await _repo.UpdateAsync(dbContext, taskDto);
         await _repo.SaveAsync(dbContext);
-        // TODO: continue here, we should emit event, so that notification service can notify on them
+        // TODO: we should emit event, so that notification service can notify on them
         await _notifyService.TaskDoneAsync(taskDto.Description, taskId);
         return taskDto.ToModel();
     }
 
-    /* 
-         * Transaction
-         *      Create statistics                           [DONE]
-         *      Transfer fund                               [DONE]
-         *          from owner (parent)                     [DONE]
-         *          to child spending account               [DONE]
-         *          the payout comes from the task payout   [DONE]
-         *      Clone task with a new NotBefore             [DONE]
-         *      Remove old task                             [DONE]
-         * Notify                                           [DONE]
-    */
     internal async Task Approve(int taskId)
     {
         // CLEAN: refactor this please
@@ -141,7 +131,7 @@ public class TaskService
                 date = DayAndWeekHelper.ComputeNextDate(taskDto.EveryOtherWeek, DateTime.UtcNow);
                 cloneTask = true;
             }
-            if (cloneTask)
+            if (cloneTask && !taskDto.Once)
             {
                 var newTaskDto = new TaskDto
                 {
@@ -259,23 +249,22 @@ public class TaskService
         };
     }
 
-    public async Task CreateNewAsync(string description, int payout, bool daily, string imageUrl,
-        int? specificUserId, 
-        uint dayOfTheWeek)
+    public async Task CreateNewAsync(CreateTask model)
     {
-        var notBefore = daily
-            ? DayAndWeekHelper.ComputeNextDate(dayOfTheWeek, DateTime.Today.Subtract(TimeSpan.FromDays(1)))
+        var notBefore = model.Daily
+            ? DayAndWeekHelper.ComputeNextDate(model.DayOfTheWeek, DateTime.Today.Subtract(TimeSpan.FromDays(1)))
             : DayAndWeekHelper.ComputeNextDate((int)0, DateTime.UtcNow);
         var taskDto = new TaskDto
         {
             Created = DateTime.UtcNow,
-            Description = description,
-            Payout = payout,
-            Week = !daily,
-            ImgUrl = imageUrl,
-            DayInTheWeek = dayOfTheWeek,
-            SpecificUserId = specificUserId,
+            Description = model.Description,
+            Payout = model.Payout,
+            Week = !model.Daily,
+            ImgUrl = model.ImageUrl,
+            DayInTheWeek = model.DayOfTheWeek,
+            SpecificUserId = model.SpecificUserId,
             NotBefore = notBefore,
+        Once = model.Once,
             Status = StatusEnum.Available
         };
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();

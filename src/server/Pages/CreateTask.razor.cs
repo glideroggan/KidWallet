@@ -7,7 +7,7 @@ using server.Services;
 
 namespace server.Pages;
 
-public class CreateTaskBase : ComponentBase
+public class CreateTaskBase : PageBase
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     [Inject] private UserService _userService { get; set; }
@@ -42,6 +42,7 @@ public class CreateTaskBase : ComponentBase
     protected List<string> images;
     private string ImageSelected;
     private DaysEnum _weekDay;
+    private bool once;
 
     protected void OnChangePayout()
     {
@@ -57,6 +58,11 @@ public class CreateTaskBase : ComponentBase
     protected void OnChangeDescription()
     {
         CardModel.Description = Description;
+    }
+
+    protected void OnceChanged(ChangeEventArgs args)
+    {
+        once = bool.Parse(args.Value.ToString());
     }
 
     protected void WeekDayChanged(ChangeEventArgs args)
@@ -78,11 +84,11 @@ public class CreateTaskBase : ComponentBase
         };
         uint dayOfTheWeek = 0;
         dayOfTheWeek = Daily ? DayAndWeekHelper.Encoder(dayArr) : DayAndWeekHelper.Encoder(_weekDay);
-        await _taskService.CreateNewAsync(Description, Payout, Daily,
-            ImageSelected,
+        // TODO: have the model be populated right on the page
+        var model = new server.Services.Models.CreateTask(Description, Payout, Daily, ImageSelected,
             childList.FirstOrDefault(c => c.Name == _targetName)?.Id,
-            dayOfTheWeek);
-
+            dayOfTheWeek, once);
+        await _taskService.CreateNewAsync(model);
 
         // show notification about that it is saved
         NotificationCallback("Saved");
@@ -93,7 +99,7 @@ public class CreateTaskBase : ComponentBase
         Daily = args.Value.ToString() == "Day";
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsyncCallback()
     {
         var imageFiles = Directory.GetFiles(Path.Combine(webHostEnvironment.WebRootPath, "assets")).ToList();
         images = imageFiles.Select(x => Path.GetFileName(x)).ToList();

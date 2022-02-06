@@ -63,23 +63,15 @@ public class NotifyService
 
     internal async Task RemoveMessage(MessageModel msg)
     {
-        return;
-        // TODO: continue here, not implemented
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        
-        var transaction = await dbContext.Database.BeginTransactionAsync();
-
-        // if message is a reserve, we should remove those lines also
-        // if (msg.ReserveId.HasValue)
-        // {
-        //     await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, msg.ReserveId.Value);
-        // }
-
-        await NotifyActions.RemoveMessage(dbContext, _repo, msg.Id);
-
-        // TODO: might not be needed, as many actions do this by default, should it be like that?
-        await dbContext.SaveChangesAsync();
-        await transaction.CommitAsync();
+        switch (msg.Type)
+        {
+            case MessageType.DoneTask:
+                // as parent, just remove message
+                await NotifyActions.RemoveMessage(dbContext, _repo, msg.Id);
+                await dbContext.SaveChangesAsync();
+                break;
+        }
     }
 
     internal async Task DeniedAsync(int msgId)

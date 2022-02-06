@@ -60,5 +60,8 @@ public class TaskDto
     public bool Week { get; set; }
     public int EveryOtherWeek { get; set; }
     public DateTime Created { get; set; } = DateTime.UtcNow;
+    
+    // do not clone task if once
+    public bool Once { get; set; }
 
 }

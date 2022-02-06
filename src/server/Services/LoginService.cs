@@ -33,7 +33,6 @@ namespace server.Services
         public async Task<(bool Ok, string Token)> ValidateAsync(string username, string? password=null)
         {
             var user = await _userService.GetUserAsync(username);
-            // TODO: Continue here, also handle passwords
             var valid = user.Role switch
             {
                 RoleEnum.Child => true,
