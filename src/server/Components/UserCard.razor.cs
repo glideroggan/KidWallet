@@ -3,6 +3,11 @@ using server.Data.User;
 
 namespace server.Components;
 
+/*
+ * [TODO] check if name right under image is better
+ * [TODO] adjust the numbers under the icons with a bit of gap
+ */
+
 public class UserCardBase : ComponentBase
 {
     [Inject] public AppState State { get; set; } = null!;

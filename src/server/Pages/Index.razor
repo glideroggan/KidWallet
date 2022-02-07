@@ -5,7 +5,7 @@
 
 @if (State.User == null)
 {
-	// TODO: wouldn't it be better to just be redirected to a login page?
+	// TODO: Make a login page instead of having it as a component
 	<LoginModule Successful="() => UpdateStateAsync()"/>
 } else {
 	<div class="container mx-1">
