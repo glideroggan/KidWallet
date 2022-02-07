@@ -34,13 +34,13 @@ img {
 
 #name {
     text-align: center;
-    font-family: 'Baskerville Old Face';
+    font-family: 'Baskerville Old Face', serif;
     font-size:1.5rem;
     font-weight: bold;
 }
 
 .info {
-    font-family: 'Baskerville Old Face';
+    font-family: 'Baskerville Old Face', serif;
 }
 
 .upper {

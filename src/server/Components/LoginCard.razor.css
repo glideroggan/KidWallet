@@ -1,21 +1,41 @@
 ﻿.card-image-container {
     width: 150px;
-    height: 120px;
+    height: 150px;
     
 }
 
 .part1 {
     grid-column-start: 1;
+    grid-row-start: 2;
+    margin-left: 10px;
+}
+
+.part1 #name {
+    font-family: 'Baskerville Old Face', serif;
+    font-size:1.5rem;
+    font-weight: bold;
+    top: 0;
+    left: 0;
+}
+
+.image-container {
+    border: black solid 1px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .part2 {
     grid-column-start: 2;
+    grid-row-start: 2;
     
 }
 
 .card-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
     align-content: center;
     grid-column-start: 1;
     align-items: center;
