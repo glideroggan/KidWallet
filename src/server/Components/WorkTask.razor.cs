@@ -27,6 +27,8 @@ public class WorkTaskBase : ComponentBase
         try
         {
             if (Data.NotBefore > DateTime.UtcNow) return;
+            
+            Waiting = true;
             switch (State.User?.Role)
             {
                 // TODO: make sure to handle any errors from a service. A service shouldn't really throw any errors
@@ -57,12 +59,14 @@ public class WorkTaskBase : ComponentBase
             await OnChange.InvokeAsync();
         }
 
+        Waiting = false;
         StateHasChanged();
     }
 
     protected async Task OnDoneAndApprove()
     {
         // TODO: do the different tasks that is needed depending on role
+        Waiting = true;
         switch (State.User.Role, Data.Status)
         {
             case (RoleEnum.Child, StatusEnum.OnGoing):
@@ -74,7 +78,7 @@ public class WorkTaskBase : ComponentBase
             default: throw new NotImplementedException("There are more cases");
         }
         await OnChange.InvokeAsync();
-        
+        Waiting = false;
     }
 
     protected async Task OnDisapprove()
