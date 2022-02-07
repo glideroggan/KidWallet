@@ -19,7 +19,7 @@ namespace server.Shared
 
         protected override Task OnInitializedAsync()
         {
-            NotificationCallback = (str) =>
+            NotificationCallback = str =>
             {
                 Message = new NotificationMessage(str);
                 InvokeAsync(() => StateHasChanged());

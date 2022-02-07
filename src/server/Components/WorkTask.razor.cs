@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using server.Data.Task;
 using server.Data.User;
+using server.Pages;
 using server.Services;
 using server.Services.Exceptions;
 
@@ -11,13 +12,16 @@ using server.Services.Exceptions;
  *      Alittle janky animation, maybe fine-tune it so things don't jump around?
  */
 namespace server.Components;
-public class WorkTaskBase : ComponentBase
+public class WorkTaskBase : PageBase
 {
     [Parameter] public TaskModel Data { get; set; }
     [Parameter] public EventCallback OnChange { get; set; }
-    [CascadingParameter] public Action<string> NotificationCallback { get; set; }
 
-    [Inject] public AppState State { get; set; }
+    protected override Task OnInitializedAsyncCallback()
+    {
+        return Task.CompletedTask;
+    }
+
     [Inject] public TaskService TaskService { get; set; }
 
     protected bool Waiting { get; set; } 
@@ -27,13 +31,10 @@ public class WorkTaskBase : ComponentBase
         try
         {
             if (Data.NotBefore > DateTime.UtcNow) return;
-            
+
             Waiting = true;
             switch (State.User?.Role)
             {
-                // TODO: make sure to handle any errors from a service. A service shouldn't really throw any errors
-                // as this will make the whole page break, instead we should handle those in the component
-                // if reserved, unreserve it, otherwise reserve it
                 case RoleEnum.Parent when Data.User == null:
                     return;
                 case RoleEnum.Parent when Data.User?.Role == RoleEnum.Child:
@@ -49,6 +50,7 @@ public class WorkTaskBase : ComponentBase
                     {
                         Data = await TaskService.ReserveAsync(Data.Id, State.User.Id);
                     }
+
                     break;
                 }
             }
@@ -56,6 +58,7 @@ public class WorkTaskBase : ComponentBase
         catch (ServiceException e)
         {
             NotificationCallback(e.Message);
+            Waiting = false;
             await OnChange.InvokeAsync();
         }
 

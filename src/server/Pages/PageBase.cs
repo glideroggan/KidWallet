@@ -1,15 +1,19 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using server.Services;
+using server.Services.Exceptions;
 
 namespace server.Pages;
 
 public abstract class PageBase : ComponentBase
 {
+#pragma warning disable CS8618
     [Inject] private LoginService LoginService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private ProtectedSessionStorage SessionStorage { get; set; }
+    [CascadingParameter] protected Action<string> NotificationCallback { get; set; }
     [Inject] protected AppState State { get; set; }
+#pragma warning restore CS8618
     protected abstract Task OnInitializedAsyncCallback();
     protected sealed override async Task OnInitializedAsync()
     {

@@ -3,7 +3,7 @@
 
 @if (Role == Data.User.RoleEnum.Parent)
 {
-	<div class="card border mx-2 mb-2 shadow-lg border-1 border-secondary">
+	<WidgetTemplate>
 		<span>Earnings/Losses last 2 weeks</span>
 		<div class="table">
 			@foreach (var child in children)
@@ -12,6 +12,7 @@
 				<span class="val">@($"{child.Earnings} SEK")</span>
 			}
 		</div>
-	</div>	
+	</WidgetTemplate>	
 }
+
 

@@ -1,8 +1,7 @@
 ﻿@namespace server.Components.Widgets
 @inherits PotentialEarningsBase
 
-
-<div class="card border mx-2 mb-2 shadow-lg border-1 border-secondary">
+<WidgetTemplate>
 	<span>Tjäna pengar idag</span>
 	<div class="table">
 		@foreach (var child in children)
@@ -10,7 +9,8 @@
 			<span class="name">@child.Name</span>
 			<span class="val">@($"{child.CanEarnToday} SEK")</span>
 		}
-	</div>
-</div>	
+	</div>	
+</WidgetTemplate>
+	
 
 

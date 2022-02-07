@@ -14,6 +14,7 @@ public class LoginCardBase : ComponentBase
 
 	[Parameter] public LoginUserModel User { get; set; }
     [Parameter] public EventCallback<string> OnSuccess { get; set; }
+    [CascadingParameter] public Action<string> NotificationCallback { get; set; }
 #pragma warning restore CS8618
 
     protected string? Password;
@@ -40,6 +41,7 @@ public class LoginCardBase : ComponentBase
 	    else
 	    {
 		    // TODO: we need to send message to notify
+		    NotificationCallback("Nope");
 	    }
     }
 

@@ -1,0 +1,11 @@
+﻿@namespace server.Components.Widgets
+
+<div class="card border mx-2 mb-2 shadow-lg border-1 border-secondary">
+    @ChildContent
+</div>
+
+
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}
