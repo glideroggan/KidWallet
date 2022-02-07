@@ -74,8 +74,7 @@ public class MessagesBase : ComponentBase
     {
         return msg switch
         {
-            {Type: MessageType.DoneTask}
-                when _state.User.Role == RoleEnum.Parent => false,
+            { } when _state.User.Role == RoleEnum.Parent => false, 
             { Sender: var sender} when sender.Id != _state.User.Id => true,
             _ => false
         };

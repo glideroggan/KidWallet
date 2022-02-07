@@ -63,10 +63,11 @@ public class NotifyService
 
     internal async Task RemoveMessage(MessageModel msg)
     {
+        // TODO: check validation, who can delete what?
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         switch (msg.Type)
         {
-            case MessageType.DoneTask:
+            default:
                 // as parent, just remove message
                 await NotifyActions.RemoveMessage(dbContext, _repo, msg.Id);
                 await dbContext.SaveChangesAsync();
