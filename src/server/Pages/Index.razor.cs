@@ -38,7 +38,7 @@ public class IndexBase : ComponentBase, IDisposable
         await UpdateStateAsync();
     }
 
-protected async Task UpdateStateAsync()
+    protected async Task UpdateStateAsync()
     {
         if (State.User == null) return;
         

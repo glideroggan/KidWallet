@@ -18,9 +18,9 @@ namespace server.Services;
 
 
 /*
- * [BUG] - remove clean room for all
- * [BUG] - the once bool wasn't honored when task was approved
- * [DONE] - tasks are returned that are already reserved by other child, continue here
+ * [DONE] - remove clean room for all
+ * [DONE] - the once bool wasn't honored when task was approved
+ * [DONE] - tasks are returned that are already reserved by other child
  * [DONE] - When updating from db, it can sometimes be a bit slow and it doesn't look right when deleting tasks
  *      We can test this by slowing down the connection and try deleting some tasks
  */

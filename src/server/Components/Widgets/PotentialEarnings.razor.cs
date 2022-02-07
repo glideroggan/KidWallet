@@ -23,20 +23,46 @@ public class PotentialEarningsBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        // get kids
-        var kidsTask = UserService.GetChildrenAsync(State.User.Id);
-        // get tasks
-        var tasks = await TaskService.GetTasksAsync(x => x.NotBefore < DateTime.UtcNow);
-        // foreach kid, filter correct tasks
-        var kids = await kidsTask;
-        children = kids.Select(x => (x.Name, 0)).ToList();
-        for (int i = 0; i < children.Count; i++) 
+        children.Clear();
+        switch (State.User.Role)
         {
-            var name = children[i].Name;
-            var money = tasks
-                .Where(x => x.TargetUser == null || x.TargetUser.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                .Sum(x => x.Payout);
-            children[i] = (name, money); 
+            case RoleEnum.Parent:
+            {
+                // get kids
+                var kidsTask = UserService.GetChildrenAsync(State.User.Id);
+                // get tasks
+                var tasks = await TaskService.GetTasksAsync(x => x.NotBefore < DateTime.UtcNow);
+                // foreach kid, filter correct tasks
+                var kids = await kidsTask;
+                children = kids.Select(x => (x.Name, 0)).ToList();
+                for (int i = 0; i < children.Count; i++)
+                {
+                    var name = children[i].Name;
+                    var money = tasks
+                        .Where(x => x.TargetUser == null ||
+                                    x.TargetUser.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                        .Sum(x => x.Payout);
+                    children[i] = (name, money);
+                }
+            }
+                break;
+            default:
+            {
+                // get tasks
+                var tasks = await TaskService.GetTasksAsync(x => x.NotBefore < DateTime.UtcNow);
+                // foreach kid, filter correct tasks
+                children.Add((State.User.Name, 0));
+                for (int i = 0; i < children.Count; i++)
+                {
+                    var name = children[i].Name;
+                    var money = tasks
+                        .Where(x => x.TargetUser == null ||
+                                    x.TargetUser.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                        .Sum(x => x.Payout);
+                    children[i] = (name, money);
+                }
+            }
+                break;
         }
     }
 }
