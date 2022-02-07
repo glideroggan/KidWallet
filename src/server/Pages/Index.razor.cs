@@ -38,10 +38,11 @@ public class IndexBase : ComponentBase, IDisposable
         await UpdateStateAsync();
     }
 
-    protected async Task UpdateStateAsync()
+protected async Task UpdateStateAsync()
     {
         if (State.User == null) return;
-
+        
+        Children.Clear();
         Children = await UserService.GetChildrenAsync(State.User.Id);
         StateHasChanged();
     }
