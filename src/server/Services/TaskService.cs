@@ -20,7 +20,7 @@ namespace server.Services;
 /*
  * [BUG] - remove clean room for all
  * [BUG] - the once bool wasn't honored when task was approved
- * [BUG] - tasks are returned that are already reserved by other child, continue here
+ * [DONE] - tasks are returned that are already reserved by other child, continue here
  * [DONE] - When updating from db, it can sometimes be a bit slow and it doesn't look right when deleting tasks
  *      We can test this by slowing down the connection and try deleting some tasks
  */
@@ -266,7 +266,7 @@ public class TaskService
             DayInTheWeek = model.DayOfTheWeek,
             SpecificUserId = model.SpecificUserId,
             NotBefore = notBefore,
-        Once = model.Once,
+            Once = model.Once,
             Status = StatusEnum.Available
         };
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();

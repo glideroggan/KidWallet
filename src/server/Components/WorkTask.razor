@@ -9,8 +9,7 @@
 else
 {
 <div id="card-background">
-    <span id="owner">@(Data.TargetUser == null ? "Alla" : Data.TargetUser.Name)</span>
-    <div id="card" class="text-center position-relative" onclick="@ClickedCard">
+    <div id="card" class="text-center" onclick="@ClickedCard">
         <div id="money">
             @Data.Payout
             @*<Components.Money Amount="@Data.Payout" ImgUrl="/assets/money.png" />*@
@@ -30,32 +29,32 @@ else
         {
             <div class="ribbon"><span>@Data.User.Name</span></div>
         }
-        
 
-        <div class="icons-container d-flex flex-row justify-content-around align-items-end">
+        <div class="icons-container d-flex justify-content-around align-items-end">
             <div class="icon-wrap d-flex"
-                onclick="@OnDoneAndApprove"
-                @onclick:stopPropagation="true">
+                 onclick="@OnDoneAndApprove"
+                 @onclick:stopPropagation="true">
                 <svg class="bi" style="color:green;" width="32" height="32" fill="currentColor">
                     <use href="@GetApproveAndDoneButtonIcon()" />
                 </svg>
             </div>
             <div class="icon-wrap d-flex"
-                onclick="@OnDisapprove"
-                @onclick:stopPropagation="true">
+                 onclick="@OnDisapprove"
+                 @onclick:stopPropagation="true">
                 <svg class="bi" style="color:red;" width="32" height="32" fill="currentColor">
                     <use href="@GetApproveButtonIconDenied()" />
                 </svg>
             </div>
             <div class="icon-wrap d-flex"
-                onclick="@(async () => await OnRemoveTask())"
-                @onclick:stopPropagation="true">
+                 onclick="@(async () => await OnRemoveTask())"
+                 @onclick:stopPropagation="true">
                 <svg class="bi" style="color:black;" width="32" height="32" fill="currentColor">
                     <use href="@CanWeTrashIt()" />
                 </svg>
             </div>
         </div>
     </div>
+    <span id="owner">@(Data.TargetUser == null ? "Alla" : Data.TargetUser.Name)</span>
 </div>    
 }
 
