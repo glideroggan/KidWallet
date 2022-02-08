@@ -2,6 +2,7 @@
 using server.Data;
 using server.Data.User;
 using server.Services;
+using server.Services.Exceptions;
 
 namespace server.Pages;
 
@@ -66,8 +67,15 @@ public class TransferBase : PageBase
         // TODO: transfer
         if (ModelPage.PayTransfer != null)
         {
-            var transferModel = new TransferModel(ModelPage.Child, ModelPage.Cost, ModelPage.PayTransfer.Description);
-            await AccountService.KidBuyAsync(transferModel);
+            var transferModel = new KidBuyModel(ModelPage.Child, ModelPage.Cost, ModelPage.PayTransfer.Description);
+            try
+            {
+                await AccountService.KidBuyAsync(transferModel);
+            }
+            catch (ServiceException e)
+            {
+                NotificationCallback(e.Message);
+            }
             
             // send a notify as feedback when done
             NotificationCallback("Sent");

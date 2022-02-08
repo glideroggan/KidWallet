@@ -46,11 +46,15 @@ public class MessagesBase : ComponentBase
 
     protected async Task Denied(int msgId)
     {
+        return;
+        
+        /*
+         * Wait with this, the idea is to deny purchases that kids asks for, but right now much of the flow doesn't work
+         */
+        
         // deny the request, the reserve should be cancelled
         var msg = Msgs.First(x => x.Id == msgId);
         await NotifyService.DeniedAsync(msgId);
-        
-        // TODO: update view
     }
 
     protected string GetStatus(MessageModel msg)

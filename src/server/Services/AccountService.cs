@@ -34,39 +34,8 @@ public class AccountService
 
     public async Task<int> ReserveMoneyAsync(int cost)
     {
-        // TODO: move the reserved money to a separate pool for this user, like a transactions
-        // that haven't been sent
-        
-        // TODO: apply rules to see if the action is valid
-        if (_state.User is not { Role: RoleEnum.Child })
-        {
-            throw new ServiceException("Du är inte inloggad");
-        }
-        
-        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        
-        // get owner account
-        // TODO: both below should be "Not tracked", as we don't want accidental changes to these entities
-        var loggedInUser = await _userRepo.GetByIdAsync(dbContext, _state.User.Id);
-        dbContext.Entry(loggedInUser).Reference("SpendingAccount").Load();
-        var ownerAccount = await _spendingRepo.GetByIdAsync(dbContext, loggedInUser.SpendingAccount.SpendingAccountId);
-        
-        // get dest account, which should be parent
-        var parent = await _userRepo.GetByIdAsync(dbContext, loggedInUser.ParentId.Value);
-        dbContext.Entry(parent).Reference("SpendingAccount").Load();
-        var destAccount = await _spendingRepo.GetByIdAsync(dbContext, parent.SpendingAccount.SpendingAccountId);
-        
-        var reserve = new ReserveDto
-        {
-            Amount = cost,
-            Created = DateTime.UtcNow,
-            Expires = DateTime.UtcNow.AddDays(1),
-            DestAccount = destAccount,
-            OwnerAccount = ownerAccount
-        };
-        var createdReserve = _reserveRepo.Add(dbContext, reserve);
-        await _reserveRepo.SaveAsync(dbContext);
-        return createdReserve.ReserveId;
+        throw new NotImplementedException();
+        // Wait with this until we have the "kid pay" flow ready
     }
 
     public async Task<List<(string? Name, int Earnings)>> GetEarningsAsync(int weeks)
@@ -93,56 +62,46 @@ public class AccountService
             .ToList();
     }
 
-    public async Task KidBuyAsync(TransferModel transferData)
+    public async Task KidBuyAsync(KidBuyModel kidBuyData)
     {
-        // TODO: refactor
-        // TODO: validate model
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        
+        await kidBuyData.ValidateAsync(dbContext, _userRepo);
+
         // create transaction
         var transaction = _spendingRepo.CreateTransaction(dbContext);
         try
         {
-            // check money on source, is enough?
+            // get sender user
             var senderUser = await _userRepo.GetAll(dbContext)
-                .Where(x => x.UserId == transferData.SenderUser.Id)
+                .Where(x => x.UserId == kidBuyData.SenderUser.Id)
                 .Include("SpendingAccount")
                 .FirstAsync();
-            if (senderUser.SpendingAccount.Balance < transferData.Funds)
-            {
-                // TODO: make it a service exception
-                throw new ArgumentException("Not enough Funds");
-            }
             // get dest user
             var destUser = await _userRepo.GetAll(dbContext)
                 .Where(x => x.UserId == senderUser.ParentId)
                 .Include("SpendingAccount")
                 .FirstAsync();
-
-            // take away money from source
-            senderUser.SpendingAccount.Balance -= transferData.Funds;
-        
+            
+            // do the transfer
+            await AccountActions.TransferFundsAsync(dbContext, _spendingRepo,
+                senderUser.SpendingAccount.SpendingAccountId, 
+                destUser.SpendingAccount.SpendingAccountId, kidBuyData.Funds);
+            
             // create account history row for source
-            // TODO: should make this even easier to not have to know if it is a debit or credit even
             await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo, 
-                senderUser, destUser, -transferData.Funds, transferData.Description);
+                senderUser, destUser, -kidBuyData.Funds, kidBuyData.Description);
 
-            // add money on dest
-            destUser.SpendingAccount.Balance += transferData.Funds;
-        
             // create account history row for dest
             await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo, 
-                destUser, senderUser, transferData.Funds, transferData.Description);
+                destUser, senderUser, kidBuyData.Funds, kidBuyData.Description);
 
             await dbContext.SaveChangesAsync();
-
             await transaction.CommitAsync();
         }
         catch (Exception e)
         {
-            // TODO: logs?
-            // TODO: notify?
             await transaction.RollbackAsync();
+            throw new ServiceException(e.Message);
         }
     }
 }
@@ -244,5 +203,19 @@ public static class AccountActions
         await dbContext.SaveChangesAsync();
         
         return taskOwner;
+    }
+
+    public static async Task TransferFundsAsync(WalletContext dbContext, IRepo<SpendingAccountDto> repo,
+        int sourceAccountId, int destAccountId, int funds)
+    {
+        var sourceAccount = await repo.GetAll(dbContext)
+            .FirstAsync(a => a.SpendingAccountId == sourceAccountId);
+        var destAccount = await repo.GetAll(dbContext)
+            .FirstAsync(a => a.SpendingAccountId == destAccountId);
+
+        sourceAccount.Balance -= funds;
+        destAccount.Balance += funds;
+
+        await dbContext.SaveChangesAsync();
     }
 }

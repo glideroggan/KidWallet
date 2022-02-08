@@ -9,7 +9,6 @@ public class WalletContextFactory : IDesignTimeDbContextFactory<WalletContext>
     public static WalletContext CreateDbContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<WalletContext>();
-        // TODO: we should hide this away somehow
         // https://www.benday.com/2017/02/17/ef-core-migrations-without-hard-coding-a-connection-string-using-idbcontextfactory/
         //var connection = @"Server=(localdb)\mssqllocaldb;Database=family.time;Trusted_Connection=True;ConnectRetryCount=0";
         var connection = "";

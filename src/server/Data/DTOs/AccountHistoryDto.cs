@@ -24,7 +24,6 @@ public class AccountHistoryDto
     [Required]
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     
-    // TODO:at some point, consolidate the two account tables to one, as they are both accounts
     [Required]
     public int SourceAccountId { get; set; }
     [Required]
