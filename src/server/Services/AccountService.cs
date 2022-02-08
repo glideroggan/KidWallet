@@ -153,10 +153,10 @@ public static class AccountActions
     }
     
     internal static async Task<string?> PayoutOfTask(WalletContext dbContext, IRepo<UserDto> userRepo, 
+        IRepo<SpendingAccountDto> spendingRepo, 
         IRepo<AccountHistoryDto> histRepo, TaskDto taskDto)
     {
         // get account from source
-        string? taskOwner;
         Debug.Assert(taskDto.User.ParentId != null);
         var parent = await userRepo.GetAll(dbContext)
             .Include("SpendingAccount")
@@ -167,39 +167,16 @@ public static class AccountActions
         var child = await userRepo.GetAll(dbContext)
             .Include("SpendingAccount")
             .FirstAsync(u => u.UserId == taskDto.User.UserId);
-        taskOwner = child.Name;
-        child.SpendingAccount.Balance += taskDto.Payout;
-        parent.SpendingAccount.Balance -= taskDto.Payout;
-        
-        // create a history row
-        // TODO: important, create an account history row
-        var sourceHist = new AccountHistoryDto
-        {
-            Description = taskDto.Description,
-            User = child,
-            Funds = taskDto.Payout,
-            CreatedDate = DateTime.UtcNow,
-            UserId = child.UserId,
-            DestAccountId = child.SpendingAccount.SpendingAccountId,
-            DestAccountType = AccountTypeEnum.Spending,
-            SourceAccountId = parent.SpendingAccount.SpendingAccountId,
-            SourceAccountType = AccountTypeEnum.Spending,
-        };
-        var destHist = new AccountHistoryDto
-        {
-            Description = taskDto.Description,
-            User = parent,
-            Funds = -taskDto.Payout,
-            CreatedDate = DateTime.UtcNow,
-            UserId = parent.UserId,
-            DestAccountId = child.SpendingAccount.SpendingAccountId,
-            DestAccountType = AccountTypeEnum.Spending,
-            SourceAccountId = parent.SpendingAccount.SpendingAccountId,
-            SourceAccountType = AccountTypeEnum.Spending,
-        };
-        histRepo.Add(dbContext, sourceHist);
-        histRepo.Add(dbContext, destHist);
+        var taskOwner = child.Name;
 
+        // transfer
+        await TransferFundsAsync(dbContext, spendingRepo, child.SpendingAccount.SpendingAccountId,
+            parent.SpendingAccount.SpendingAccountId, taskDto.Payout);
+        
+        // create a history rows
+        await CreateAccountHistory(dbContext, histRepo, child, parent, taskDto.Payout, taskDto.Description);
+        await CreateAccountHistory(dbContext, histRepo, parent, child, -taskDto.Payout, taskDto.Description);
+        
         await dbContext.SaveChangesAsync();
         
         return taskOwner;

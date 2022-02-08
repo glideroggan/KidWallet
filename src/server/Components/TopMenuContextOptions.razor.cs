@@ -12,7 +12,7 @@ public class TopMenuContextOptionsBase : ComponentBase, IDisposable
     [Inject] private NavContextService NavContextService { get; set; }
 #pragma warning restore CS8618
 
-    protected List<(string Icon, string Url)> Links { get; set; } = new();
+    protected List<(string Icon, string Url)>? Links { get; set; } = new();
 
     private void LocationChanged(object? sender, LocationChangedEventArgs args)
     {

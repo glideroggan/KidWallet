@@ -59,27 +59,24 @@ public class TransferBase : PageBase
 
     protected async Task DoTransfer()
     {
-        // TODO: handle any errors, like rollback
-        // Now that is handled inside the service, but we get no feedback back here that it failed
-        // and that is bad, so we need to handle it
         // TODO: fix waiting
         
-        // TODO: transfer
         if (ModelPage.PayTransfer != null)
         {
             var transferModel = new KidBuyModel(ModelPage.Child, ModelPage.Cost, ModelPage.PayTransfer.Description);
             try
             {
                 await AccountService.KidBuyAsync(transferModel);
+                
+                // send a notify as feedback when done
+                NotificationCallback("Sent");
             }
             catch (ServiceException e)
             {
                 NotificationCallback(e.Message);
             }
-            
-            // send a notify as feedback when done
-            NotificationCallback("Sent");
         }
+        // TODO: transfer
     }
 
     protected bool AllGood()

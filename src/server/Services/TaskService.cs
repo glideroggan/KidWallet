@@ -117,8 +117,7 @@ public class TaskService
             await AccountActions.CreateStat(dbContext, _statRepo, taskDto);
 
             // Transfer fund 
-            
-            taskOwner = await AccountActions.PayoutOfTask(dbContext, _userRepo, _accountHistoryRepo, taskDto);
+            taskOwner = await AccountActions.PayoutOfTask(dbContext, _userRepo, _spendingRepo, _accountHistoryRepo, taskDto);
 
             // Clone task with a new NotBefore
             var date = DateTime.UtcNow;

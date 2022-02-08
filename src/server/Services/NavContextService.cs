@@ -15,10 +15,13 @@ namespace server.Services
              * and location changed event will happen before
              */
             RegisterPage("tasks", ("/assets/bootstrap-icons/bootstrap-icons.svg#plus-circle-fill", "/CreateTask", RoleEnum.Parent));
+            // TODO: put in a more suitable icon
+            RegisterPage("admin", ("/assets/bootstrap-icons/bootstrap-icons.svg#plus-circle-fill", "/achievements", RoleEnum.Parent));
         }
-        internal List<(string Icon, string Url)> GetMenuItems(string page)
+        internal List<(string Icon, string Url)>? GetMenuItems(string page)
         {
             if (!_subPages.ContainsKey(page)) return null;
+            
             return _subPages[page]
                 .Where(p => p.ValidRole == _state.User.Role)
                 .Select(p => (p.Icon, p.Url))

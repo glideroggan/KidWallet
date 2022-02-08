@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using server.Data.User;
 using server.Services;
 using server.Services.Exceptions;
 
@@ -14,6 +15,11 @@ public abstract class PageBase : ComponentBase
     [CascadingParameter] protected Action<string> NotificationCallback { get; set; }
     [Inject] protected AppState State { get; set; }
 #pragma warning restore CS8618
+
+    protected virtual bool CheckAuthorization(RoleEnum currentRole)
+    {
+        return true;
+    }
     protected abstract Task OnInitializedAsyncCallback();
     protected sealed override async Task OnInitializedAsync()
     {
@@ -21,6 +27,9 @@ public abstract class PageBase : ComponentBase
         {
             var results = await LoginService.ValidateLoginAsync(async () => await SessionStorage.GetAsync<string>("token"));
             if (!results) NavigationManager.NavigateTo("/", true);
+    
+            // is user allowed?
+            if (!CheckAuthorization(State.User.Role)) NavigationManager.NavigateTo("/", true);
             
             // call OnInitialized
             await OnInitializedAsyncCallback();
