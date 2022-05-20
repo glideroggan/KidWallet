@@ -76,7 +76,7 @@ namespace server.Services
         }
         
         
-        private bool VerifyPassword(byte[] hashedPassword, string passwordHash)
+        private bool VerifyPassword(byte[] hashedPassword, string password)
         {
             var prf = KeyDerivationPrf.HMACSHA256;
             var salt = new byte[_saltSize];
@@ -85,7 +85,7 @@ namespace server.Services
             var expectedSubKey = new byte[hashedPassword.Length - salt.Length];
             Buffer.BlockCopy(hashedPassword, salt.Length, expectedSubKey, 0, expectedSubKey.Length);
 
-            var actualSubKey = KeyDerivation.Pbkdf2(passwordHash, salt, prf, _iterCount, expectedSubKey.Length);
+            var actualSubKey = KeyDerivation.Pbkdf2(password, salt, prf, _iterCount, expectedSubKey.Length);
             return ByteArraysEqual(expectedSubKey, actualSubKey);
         }
 

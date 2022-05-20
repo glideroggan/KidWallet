@@ -3,11 +3,11 @@
 namespace server.Pages;
 
 /*
- * [DONE] context menu to create achievements
  * [TODO] information about the family
  *      number of users, parents, children
  *      number of tasks
  * [TODO] Context menu to create/edit users
+ * [DONE] context menu to create achievements
  * [DONE] add validation for Role on this page
  *      after it is tested, remove it from the navmenu
  */
