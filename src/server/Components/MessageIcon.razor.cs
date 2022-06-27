@@ -35,7 +35,7 @@ public class MessagesBase : ComponentBase
     protected string GetMessageIcon() =>
         Messages switch
         {
-            { Count: > 0 } => "/assets/bootstrap-icons/bootstrap-icons.svg#envelope-check",
-            _ => "/assets/bootstrap-icons/bootstrap-icons.svg#envelope",
+            { Count: > 0 } => "assets/bootstrap-icons/bootstrap-icons.svg#envelope-check",
+            _ => "assets/bootstrap-icons/bootstrap-icons.svg#envelope",
         };
 }

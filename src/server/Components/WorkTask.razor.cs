@@ -120,7 +120,7 @@ public class WorkTaskBase : PageBase
         if (State.User == null) return "";
         return (Data.Status, State.User.Role) switch
         {
-            (_, RoleEnum.Parent) => "/assets/bootstrap-icons/bootstrap-icons.svg#trash",
+            (_, RoleEnum.Parent) => "assets/bootstrap-icons/bootstrap-icons.svg#trash",
             _ => ""
         };
     }
@@ -138,8 +138,8 @@ public class WorkTaskBase : PageBase
         if (State.User == null) return "";
         return (Data.Status, State.User.Role) switch
         {
-            (StatusEnum.WaitingForApproval, RoleEnum.Parent) => "/assets/bootstrap-icons/bootstrap-icons.svg#check",
-            (StatusEnum.OnGoing, RoleEnum.Child) => "/assets/bootstrap-icons/bootstrap-icons.svg#check",
+            (StatusEnum.WaitingForApproval, RoleEnum.Parent) => "assets/bootstrap-icons/bootstrap-icons.svg#check",
+            (StatusEnum.OnGoing, RoleEnum.Child) => "assets/bootstrap-icons/bootstrap-icons.svg#check",
             _ => ""
         };
     }
@@ -157,7 +157,7 @@ public class WorkTaskBase : PageBase
         if (State.User == null) return "";
         return (Data.Status, State.User.Role) switch
         {
-            (StatusEnum.WaitingForApproval, RoleEnum.Parent) => "/assets/bootstrap-icons/bootstrap-icons.svg#emoji-frown-fill",
+            (StatusEnum.WaitingForApproval, RoleEnum.Parent) => "assets/bootstrap-icons/bootstrap-icons.svg#emoji-frown-fill",
             _ => "",
         };
     }

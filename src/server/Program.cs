@@ -12,17 +12,21 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     Args = args
 });
 
-builder.WebHost.ConfigureKestrel(o =>
-{
-    o.ConfigureEndpointDefaults(t =>  
-        t.Protocols = HttpProtocols.Http1AndHttp2);
-});
-
 builder.WebHost.ConfigureAppConfiguration((ctx, config) =>
 {
     config.AddJsonFile("appsettings.json");
     config.AddEnvironmentVariables();
 });
+
+builder.WebHost.ConfigureKestrel(o =>
+{
+    //o.ListenAnyIP(443);
+    o.ConfigureEndpointDefaults(t =>
+        {
+            t.Protocols = HttpProtocols.Http1AndHttp2;
+        });
+});
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -65,7 +69,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseStaticFiles();
 app.UseRouting();
