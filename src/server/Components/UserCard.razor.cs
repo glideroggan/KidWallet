@@ -25,10 +25,10 @@ public class UserCardBase : ComponentBase
         switch (State.User.Role)
         {
             case RoleEnum.Child when Model.Id == State.User.Id:
-                Nav.NavigateTo("/pay");
+                Nav.NavigateTo("pay");
                 break;
             case RoleEnum.Parent when Model.Role == RoleEnum.Child:
-                Nav.NavigateTo($"/transfer/{name}");
+                Nav.NavigateTo($"transfer/{name}");
                 break;
         }
         return Task.CompletedTask;

@@ -26,7 +26,7 @@ public class MessagesBase : ComponentBase
 
     protected async Task OnClickAsync()
     {
-        Nav.NavigateTo("/messages");
+        Nav.NavigateTo("messages");
         // refresh now when clicked
         Messages.Clear();
         StateHasChanged();

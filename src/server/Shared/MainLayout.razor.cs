@@ -50,7 +50,7 @@ namespace server.Shared
         protected void Logout()
         {
             State.User = null;
-            Nav.NavigateTo("/");
+            Nav.NavigateTo("");
             State.NotifyStateChanged();
         }
     }
