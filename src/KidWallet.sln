@@ -8,13 +8,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC8A56B8-8593-411B-B312-B05140624346}"
 	ProjectSection(SolutionItems) = preProject
 		build.ps1 = build.ps1
+		compose.yaml = compose.yaml
+		Dockerfile = Dockerfile
 		..\SQLQuery1.sql = ..\SQLQuery1.sql
 		Todo.txt = Todo.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrations", "Migrations\Migrations.csproj", "{7CAAC1C0-5880-4B3C-9414-CD5DC8DB2CBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{137981F4-A0E3-49FD-9E35-02AFA26B7F27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tests", "tests\tests.csproj", "{137981F4-A0E3-49FD-9E35-02AFA26B7F27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,12 +6,22 @@ using server.Data;
 using server.Repositories;
 using server.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    WebRootPath = "wwwroot",
+    Args = args
+});
 
 builder.WebHost.ConfigureKestrel(o =>
 {
     o.ConfigureEndpointDefaults(t =>  
         t.Protocols = HttpProtocols.Http1AndHttp2);
+});
+
+builder.WebHost.ConfigureAppConfiguration((ctx, config) =>
+{
+    config.AddJsonFile("appsettings.json");
+    config.AddEnvironmentVariables();
 });
 
 // Add services to the container.
@@ -20,7 +30,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddDbContextFactory<WalletContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("Database"),
+    opt.UseSqlServer(builder.Configuration.GetValue<string>("ConnectionString"),
         x =>
         {
             x.MigrationsAssembly("Migrations");
