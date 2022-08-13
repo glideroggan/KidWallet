@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 builder.WebHost.ConfigureAppConfiguration((ctx, config) =>
 {
     config.AddJsonFile("appsettings.json");
+    config.AddJsonFile("appsettings.development.json", optional: true);
     config.AddEnvironmentVariables();
 });
 
