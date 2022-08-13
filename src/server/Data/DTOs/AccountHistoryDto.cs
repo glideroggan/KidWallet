@@ -14,7 +14,8 @@ public enum AccountTypeEnum
 public class AccountHistoryDto
 {
     [Key]
-    public int TransactionDataId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int TransactionDataId { get; set; } = 0;
     [Required]
     public int UserId { get; set; }
     

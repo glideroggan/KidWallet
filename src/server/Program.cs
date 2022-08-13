@@ -29,16 +29,29 @@ builder.WebHost.ConfigureKestrel(o =>
 
 
 // Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+var services = builder.Services;
+services.AddControllers();
+services.AddRazorPages();
+services.AddServerSideBlazor();
+services.AddCors(options =>
+{
+    options.AddPolicy("local", policy =>
+    {
+        policy.AllowAnyOrigin();
+    });
+});
+
+
 
 builder.Services.AddDbContextFactory<WalletContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetValue<string>("ConnectionString"),
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("Default") //builder.Configuration.GetValue<string>("ConnectionString")
+        ,
         x =>
         {
-            x.MigrationsAssembly("Migrations");
+            x.MigrationsAssembly("server");
         }));
+
+services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddScoped<AppState>();
 builder.Services.AddScoped<NavContextService>();

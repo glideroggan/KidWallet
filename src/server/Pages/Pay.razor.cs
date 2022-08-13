@@ -14,8 +14,6 @@ public class PayBase : PageBase
     
 #pragma warning restore CS8618
 
-    [CascadingParameter] private Action<string> NotificationCallback { get;set; }
-
     protected int Balance;
     protected int Cost;
     protected string? Description;

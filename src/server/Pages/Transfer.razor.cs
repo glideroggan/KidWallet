@@ -8,7 +8,6 @@ namespace server.Pages;
 
 public class TransferBase : PageBase
 {
-    [CascadingParameter] public Action<string> NotificationCallback { get; set; }
     [Parameter] public string? Name { get; set; }
     [Inject] private UserService UserService { get; set; }
     [Inject] private AccountService AccountService { get; set; }

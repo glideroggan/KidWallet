@@ -16,6 +16,10 @@
     <ProjectReference Include="..\server\server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations" />
+  </ItemGroup>
+
   <PropertyGroup>
     <BaseOutputPath>..\server\bin\</BaseOutputPath>
   </PropertyGroup>

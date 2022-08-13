@@ -4,14 +4,16 @@
 
 <h3>Transfer</h3>
 
-<MyRadioButton OnSelected="TransferTypeChanged">
+<MyRadioButton Id="group1" OnSelected="TransferTypeChanged">
 	<RadioButtonOptionItem Item="Pay">Betala för</RadioButtonOptionItem>
 	<RadioButtonOptionItem Item="Transfer">Överföring</RadioButtonOptionItem>
 </MyRadioButton>
 
 @if (TransferType == TransferTypeEnum.Pay)
 {
-	<MyRadioButton OnSelected="ChildChanged">
+	@*BUG: When selecting a child in this radio group, the other radio group loses the selection
+Should work with the fieldset, but it doesn't*@
+	<MyRadioButton Id="group2" OnSelected="ChildChanged">
 		@foreach (var child in children)
 		{
 			<RadioButtonOptionItem Item="@child.Name">@child.Name</RadioButtonOptionItem>
@@ -46,4 +48,6 @@
 		</div>	
 	}
 }
+
+@* TODO: after pressing button we should update the controls, maybe reset them *@
 <button class="btn-primary btn" @onclick="@DoTransfer">Send</button>

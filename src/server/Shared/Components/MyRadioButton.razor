@@ -1,7 +1,9 @@
 ﻿@inherits MyRadioButtonBase
 
 <div class="wrapper">
-    <CascadingValue name="RadioGroup" Value="@this">
-        @ChildContent
-    </CascadingValue>
+    <fieldset id="@Id">
+        <CascadingValue name="RadioGroup" Value="@this">
+            @ChildContent
+        </CascadingValue>
+    </fieldset>
 </div>

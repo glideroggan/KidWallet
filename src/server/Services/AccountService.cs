@@ -131,7 +131,7 @@ public static class AccountActions
             SourceAccountId = sender.SpendingAccount.SpendingAccountId,
             SourceAccountType = AccountTypeEnum.Spending
         };
-        repo.Add(ctx, model);
+    var debug = repo.Add(ctx, model);
         
         return Task.CompletedTask;
     }

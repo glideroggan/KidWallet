@@ -9,11 +9,11 @@ using server.Data;
 
 #nullable disable
 
-namespace core.Migrations
+namespace server.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20220204220822_MessageType")]
-    partial class MessageType
+    [Migration("20220813102443_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -83,6 +83,9 @@ namespace core.Migrations
                     b.Property<int>("MessageType")
                         .HasColumnType("int");
 
+                    b.Property<int>("SenderUserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -93,12 +96,9 @@ namespace core.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderUserId");
 
                     b.ToTable("Notifications");
                 });
@@ -225,6 +225,9 @@ namespace core.Migrations
                     b.Property<DateTime>("NotBefore")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Once")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Payout")
                         .HasColumnType("int");
 
@@ -297,7 +300,7 @@ namespace core.Migrations
                 {
                     b.HasOne("server.Data.DTOs.UserDto", "Sender")
                         .WithMany("Notifications")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

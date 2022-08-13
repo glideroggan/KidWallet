@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server.Data;
 
 #nullable disable
 
-namespace core.Migrations
+namespace server.Migrations
 {
     [DbContext(typeof(WalletContext))]
-    [Migration("20220129191520_AddReserveIdToMessage")]
-    partial class AddReserveIdToMessage
+    partial class WalletContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,6 +21,47 @@ namespace core.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("server.Data.DTOs.AccountHistoryDto", b =>
+                {
+                    b.Property<int>("TransactionDataId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionDataId"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("DestAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DestAccountType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Funds")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceAccountType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TransactionDataId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AccountHistories");
+                });
 
             modelBuilder.Entity("server.Data.DTOs.NotificationDto", b =>
                 {
@@ -32,11 +71,20 @@ namespace core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"), 1L, 1);
 
+                    b.Property<int?>("IdentifierId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ReserveId")
+                    b.Property<int>("MessageType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<int>("Target")
@@ -46,18 +94,9 @@ namespace core.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("TaskId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Unread")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SenderUserId");
 
                     b.ToTable("Notifications");
                 });
@@ -184,7 +223,13 @@ namespace core.Migrations
                     b.Property<DateTime>("NotBefore")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Once")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Payout")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SpecificUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -197,6 +242,8 @@ namespace core.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("TaskId");
+
+                    b.HasIndex("SpecificUserId");
 
                     b.HasIndex("UserId");
 
@@ -236,12 +283,23 @@ namespace core.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("server.Data.DTOs.AccountHistoryDto", b =>
+                {
+                    b.HasOne("server.Data.DTOs.UserDto", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("server.Data.DTOs.NotificationDto", b =>
                 {
                     b.HasOne("server.Data.DTOs.UserDto", "Sender")
                         .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Sender");
@@ -252,13 +310,13 @@ namespace core.Migrations
                     b.HasOne("server.Data.DTOs.SpendingAccountDto", "DestAccount")
                         .WithMany("ReservedIncomingAmounts")
                         .HasForeignKey("DestAccountSpendingAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("server.Data.DTOs.SpendingAccountDto", "OwnerAccount")
                         .WithMany("ReservedAmounts")
                         .HasForeignKey("OwnerAccountSpendingAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("DestAccount");
@@ -271,7 +329,7 @@ namespace core.Migrations
                     b.HasOne("server.Data.DTOs.UserDto", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -279,9 +337,15 @@ namespace core.Migrations
 
             modelBuilder.Entity("server.Data.DTOs.TaskDto", b =>
                 {
+                    b.HasOne("server.Data.DTOs.UserDto", "TargetUser")
+                        .WithMany()
+                        .HasForeignKey("SpecificUserId");
+
                     b.HasOne("server.Data.DTOs.UserDto", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("TargetUser");
 
                     b.Navigation("User");
                 });

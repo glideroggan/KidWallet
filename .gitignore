@@ -350,3 +350,6 @@ MigrationBackup/
 .ionide/
 /src/.idea/.idea.KidWallet/.idea
 /src/server/wwwroot/assets
+/src/compose.yaml
+/src/compose.yaml.bak
+/src/server/appsettings.development.json

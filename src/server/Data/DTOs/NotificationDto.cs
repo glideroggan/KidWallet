@@ -29,6 +29,6 @@ public class NotificationDto
     [StringLength(maximumLength:20)]
     public string? TargetName { get; set; }
 
-    [ForeignKey("UserId")]
+    
     public UserDto Sender { get; set; }
 }
