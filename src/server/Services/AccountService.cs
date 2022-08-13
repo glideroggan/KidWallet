@@ -137,10 +137,11 @@ public static class AccountActions
     }
     internal static async Task CreateStat(WalletContext dbContext, IRepo<StatDto> repo, TaskDto taskDto)
     {
+        // TODO: thinking here is wrong, as we remove the tasks, so it will create a new taskId, so we can't base the stats on the taskId
         var stat = StatHelper.CreateStat(taskDto);
         // get stat from db, if exists
-        var statDb = await repo.GetBy2Id(dbContext, taskDto.TaskId,
-            taskDto.UserId.Value);
+        var statDb = repo.GetAll(dbContext).FirstOrDefault(x => x.Description == stat.Description);
+        // var statDb = await repo.GetBy2Id(dbContext, taskDto.TaskId, taskDto.UserId.Value);
         if (statDb != null)
         {
             statDb.Count++;
@@ -170,21 +171,31 @@ public static class AccountActions
         var taskOwner = child.Name;
 
         // transfer
-        await TransferFundsAsync(dbContext, spendingRepo, child.SpendingAccount.SpendingAccountId,
-            parent.SpendingAccount.SpendingAccountId, taskDto.Payout);
+        await TransferFundsAsync(dbContext, spendingRepo, 
+            parent.SpendingAccount.SpendingAccountId,
+            child.SpendingAccount.SpendingAccountId, taskDto.Payout);
         
         // create a history rows
-        await CreateAccountHistory(dbContext, histRepo, child, parent, taskDto.Payout, taskDto.Description);
         await CreateAccountHistory(dbContext, histRepo, parent, child, -taskDto.Payout, taskDto.Description);
+        await CreateAccountHistory(dbContext, histRepo, child, parent, taskDto.Payout, taskDto.Description);
         
         await dbContext.SaveChangesAsync();
         
         return taskOwner;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dbContext"></param>
+    /// <param name="repo"></param>
+    /// <param name="sourceAccountId">Account to get money from</param>
+    /// <param name="destAccountId">Account to receive money</param>
+    /// <param name="funds">Positive value</param>
     public static async Task TransferFundsAsync(WalletContext dbContext, IRepo<SpendingAccountDto> repo,
         int sourceAccountId, int destAccountId, int funds)
     {
+        Debug.Assert(funds > 0);
         var sourceAccount = await repo.GetAll(dbContext)
             .FirstAsync(a => a.SpendingAccountId == sourceAccountId);
         var destAccount = await repo.GetAll(dbContext)

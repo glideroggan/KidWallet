@@ -18,7 +18,7 @@ public class CreateTaskBase : PageBase
 
     protected List<string> items = new() { "roger", "Sylwia", "Sex" };
 
-    [CascadingParameter] private Action<string> NotificationCallback { get; set; }
+    // [CascadingParameter] private Action<string> NotificationCallback { get; set; }
 
     protected bool monday { get; set; }
     protected bool tuesday { get; set; }

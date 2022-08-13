@@ -113,7 +113,7 @@ public class TaskService
             // create stat of the transaction
             // workaround until we change the setup in db, by adding migrations to this project
             // NOTE: transaction is needed for this to be persistent to the same session
-            _statRepo.ExecuteSqlCommand(dbContext, "SET IDENTITY_INSERT [dbo].[doneTasks] ON");
+            // _statRepo.ExecuteSqlCommand(dbContext, "SET IDENTITY_INSERT [dbo].[doneTasks] ON");
             await AccountActions.CreateStat(dbContext, _statRepo, taskDto);
 
             // Transfer fund 
@@ -130,7 +130,7 @@ public class TaskService
             }
             if (taskDto.Week)
             {
-                date = DayAndWeekHelper.ComputeNextDate(taskDto.EveryOtherWeek, DateTime.UtcNow);
+                date = DayAndWeekHelper.ComputeNextDate(taskDto.Week ? 1 : taskDto.EveryOtherWeek, DateTime.UtcNow);
                 cloneTask = true;
             }
             if (cloneTask && !taskDto.Once)
