@@ -19,7 +19,7 @@ public class AccountService
     private readonly IRepo<UserDto> _userRepo;
     private readonly IRepo<AccountHistoryDto> _accountHistoryRepo;
 
-    public AccountService(IRepo<SpendingAccountDto> spendingRepo, IRepo<SavingAccountDto> savingsRepo, 
+    public AccountService(IRepo<SpendingAccountDto> spendingRepo, IRepo<SavingAccountDto> savingsRepo,
         IRepo<ReserveDto> reserveRepo, IDbContextFactory<WalletContext> dbContextFactory,
         IRepo<UserDto> userRepo, AppState state, IRepo<AccountHistoryDto> accountHistoryRepo)
     {
@@ -81,18 +81,18 @@ public class AccountService
                 .Where(x => x.UserId == senderUser.ParentId)
                 .Include("SpendingAccount")
                 .FirstAsync();
-            
+
             // do the transfer
             await AccountActions.TransferFundsAsync(dbContext, _spendingRepo,
-                senderUser.SpendingAccount.SpendingAccountId, 
+                senderUser.SpendingAccount.SpendingAccountId,
                 destUser.SpendingAccount.SpendingAccountId, kidBuyData.Funds);
-            
+
             // create account history row for source
-            await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo, 
+            await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo,
                 senderUser, destUser, -kidBuyData.Funds, kidBuyData.Description);
 
             // create account history row for dest
-            await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo, 
+            await AccountActions.CreateAccountHistory(dbContext, _accountHistoryRepo,
                 destUser, senderUser, kidBuyData.Funds, kidBuyData.Description);
 
             await dbContext.SaveChangesAsync();
@@ -131,17 +131,18 @@ public static class AccountActions
             SourceAccountId = sender.SpendingAccount.SpendingAccountId,
             SourceAccountType = AccountTypeEnum.Spending
         };
-    var debug = repo.Add(ctx, model);
-        
+        var debug = repo.Add(ctx, model);
+
         return Task.CompletedTask;
     }
+
     internal static async Task CreateStat(WalletContext dbContext, IRepo<StatDto> repo, TaskDto taskDto)
     {
         // TODO: thinking here is wrong, as we remove the tasks, so it will create a new taskId, so we can't base the stats on the taskId
         var stat = StatHelper.CreateStat(taskDto);
         // get stat from db, if exists
-        var statDb = repo.GetAll(dbContext).FirstOrDefault(x => x.Description == stat.Description);
-        // var statDb = await repo.GetBy2Id(dbContext, taskDto.TaskId, taskDto.UserId.Value);
+        var statDb = repo.GetAll(dbContext)
+            .FirstOrDefault(x => x.Description == stat.Description && x.UserId == stat.UserId);
         if (statDb != null)
         {
             statDb.Count++;
@@ -150,18 +151,23 @@ public static class AccountActions
         {
             repo.Add(dbContext, stat);
         }
+
         await dbContext.SaveChangesAsync();
     }
-    
-    internal static async Task<string?> PayoutOfTask(WalletContext dbContext, IRepo<UserDto> userRepo, 
-        IRepo<SpendingAccountDto> spendingRepo, 
+
+    internal static async Task<string?> PayoutOfTask(WalletContext dbContext, IRepo<UserDto> userRepo,
+        IRepo<SpendingAccountDto> spendingRepo,
         IRepo<AccountHistoryDto> histRepo, TaskDto taskDto)
     {
         // get account from source
         Debug.Assert(taskDto.User.ParentId != null);
         var parent = await userRepo.GetAll(dbContext)
             .Include("SpendingAccount")
-            .FirstAsync(u => u.UserId == taskDto.User.ParentId.Value);
+            .FirstOrDefaultAsync(u => u.UserId == taskDto.User.ParentId.Value);
+        Debug.Assert(parent != null);
+        //var parent = users
+        //    .Include("SpendingAccount")
+        //    .FirstAsync(u => u.UserId == taskDto.User.ParentId.Value);
         Debug.Assert(parent.SpendingAccount.Balance >= taskDto.Payout);
 
         // to child spending account
@@ -171,16 +177,16 @@ public static class AccountActions
         var taskOwner = child.Name;
 
         // transfer
-        await TransferFundsAsync(dbContext, spendingRepo, 
+        await TransferFundsAsync(dbContext, spendingRepo,
             parent.SpendingAccount.SpendingAccountId,
             child.SpendingAccount.SpendingAccountId, taskDto.Payout);
-        
+
         // create a history rows
         await CreateAccountHistory(dbContext, histRepo, parent, child, -taskDto.Payout, taskDto.Description);
         await CreateAccountHistory(dbContext, histRepo, child, parent, taskDto.Payout, taskDto.Description);
-        
+
         await dbContext.SaveChangesAsync();
-        
+
         return taskOwner;
     }
 
