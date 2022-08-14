@@ -33,7 +33,7 @@ public class AccountService
     }
 
     // TODO: we really need an easy function to call here to get the users balance
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -53,19 +53,20 @@ public class AccountService
         // reserve the money
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var transaction = _spendingRepo.CreateTransaction(dbContext);
-        var reserveDto = await AccountActions.TransferToReserveAsync(dbContext, _reserveRepo, _userRepo, 
+        var reserveDto = await AccountActions.TransferToReserveAsync(dbContext, _reserveRepo, _userRepo,
             sourceUserId, destUserId, cost);
 
         await dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
-        
+
         // update balance for state (depends if the source user is the same as the current user)
         if (_state.User.Id == sourceUserId)
         {
             _state.Balance -= cost;
+            _state.NotifyStateChanged();
         }
-        
-        
+
+
         return reserveDto.ReserveId;
     }
 
@@ -135,6 +136,15 @@ public class AccountService
             throw new ServiceException(e.Message);
         }
     }
+
+    public async Task CancelReserveAsync(int reserveId)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var reserveDto = await _reserveRepo.GetByIdAsync(dbContext, reserveId);
+        Debug.Assert(reserveDto != null);
+
+        await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, reserveDto.ReserveId);
+    }
 }
 
 public class AccountException : Exception
@@ -148,9 +158,18 @@ public static class AccountActions
 {
     internal static async Task CancelReserveAsync(WalletContext ctx, IRepo<ReserveDto> repo, int reserveId)
     {
-        var reserve = await repo.GetByIdAsync(ctx, reserveId);
-        if (reserve == null) return;
+        // get the reserve
+        var reserve = await repo.GetAll(ctx)
+            .Where(x => x.ReserveId == reserveId)
+            .Include("OwnerAccount")
+            .FirstOrDefaultAsync();
+        // return money to sender
+        var sourceSpendingAccount = reserve.OwnerAccount;
+        sourceSpendingAccount.Balance -=
+            reserve.Amount; // the amount is negative from the beginning, so returning needs to be positive
+        // delete reserve
         repo.Remove(ctx, reserve);
+
         await ctx.SaveChangesAsync();
     }
 
@@ -163,11 +182,11 @@ public static class AccountActions
         var destUser = await userRepo.GetAll(ctx).Include("SpendingAccount")
             .FirstOrDefaultAsync(a => a.UserId == destUserId);
         Debug.Assert(sourceUser != null && destUser != null);
-        
+
         var sourceSpendingAccountDto = sourceUser.SpendingAccount;
         var destSpendingAccountDto = destUser.SpendingAccount;
         Debug.Assert(sourceSpendingAccountDto != null && destSpendingAccountDto != null);
-        
+
         sourceSpendingAccountDto.Balance += amount;
         // add a reserve row
         var dto = new ReserveDto

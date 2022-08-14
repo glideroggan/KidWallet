@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace server.Data.DTOs;
 public static class UserExtensions
 {
+    // TODO: this "banked" is not good. It shouldn't be on that model
     public static UserModel ToModel(this UserDto d, int banked) => 
         new UserModel(d.UserId, d.Name, d.Password, d.ProfileImg, d.Role, d.SpendingAccount?.Balance ?? 0, banked);
     

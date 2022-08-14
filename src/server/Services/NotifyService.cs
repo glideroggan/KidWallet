@@ -21,10 +21,11 @@ public enum MessageType
 {
     None = 0,
     DoneTask,
-    Buy
+    Buy,
+    DeniedBuy
 }
 
-public record NotifyMessage(MessageType MessageType, string Msg, int Identifier);
+public record NotifyMessage(MessageType MessageType, string Msg, int? Identifier=null, int? ReceiverSpecificId=null);
 
 public class NotifyService
 {
@@ -76,21 +77,10 @@ public class NotifyService
         }
     }
 
-    internal async Task DeniedAsync(int msgId)
+    internal async Task DeniedAsync(string msg, int receiverId)
     {
-        return;
-        // TODO: not implemented
-        // await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-        // var transaction = _repo.CreateTransaction(dbContext);
-        //
-        // var msg = await _repo.GetAll(dbContext).FirstAsync(x => x.NotificationId == msgId);
-        // // TODO: make sure it is a reserve
-        //
-        // await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, msg.ReserveId.Value);
-        // msg.Status = MessageStatusEnum.Denied;
-        // await _repo.UpdateAsync(dbContext, msg);
-        // await dbContext.SaveChangesAsync();
-        // await transaction.CommitAsync();
+        var msgData = new NotifyMessage(MessageType.DeniedBuy, msg, ReceiverSpecificId:receiverId);
+        await SendMsgAsync(msgData);
     }
 
     public async Task<IList<MessageModel>> GetMessagesAsync(Expression<Func<NotificationDto, bool>> WhereCallback)
@@ -105,7 +95,7 @@ public class NotifyService
         return msgs;
     }
 
-    public async Task SendMsg(NotifyMessage msg)
+    public async Task SendMsgAsync(NotifyMessage msg)
     {
         Debug.Assert(_state.User != null);
         if (_state.User == null) return;
@@ -114,17 +104,26 @@ public class NotifyService
         {
             MessageType.DoneTask => NotificationTargetEnum.Parent,
             MessageType.Buy => NotificationTargetEnum.Parent,
+            MessageType.DeniedBuy => NotificationTargetEnum.Individual,
             _ => throw new NotImplementedException("TODO:")
         };
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var sender = await _userRepo.GetByIdAsync(dbContext, _state.User.Id);
+        UserDto? receiver = null;
+        if (noteTarget == NotificationTargetEnum.Individual)
+        {
+            Debug.Assert(msg.ReceiverSpecificId.HasValue);
+            receiver = await _userRepo.GetByIdAsync(dbContext, msg.ReceiverSpecificId.Value);
+        }
         var data = new NotificationDto
         {
             Message = msg.Msg,
             IdentifierId = msg.Identifier,
             Target = noteTarget,
             Sender = sender,
-            Status = MessageStatusEnum.Unread
+            Status = MessageStatusEnum.Unread,
+            TargetName = receiver?.Name,
+            MessageType = msg.MessageType
         };
         
         _repo.Add(dbContext, data);
@@ -139,7 +138,7 @@ public class NotifyService
          * send message to parent that the task is done and should be checked
          */
         var msg = new NotifyMessage(MessageType.DoneTask, $"I'm done with task '{taskDescription}!", taskId);
-        await SendMsg(msg);
+        await SendMsgAsync(msg);
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using server.Data.DTOs;
 using server.Data.Message;
@@ -44,17 +45,22 @@ public class MessagesBase : ComponentBase
         Msgs = query.ToList();
     }
 
+    protected async Task Approved(int msgId)
+    {
+        // TODO: continue here
+        throw new NotImplementedException();
+    }
+    
     protected async Task Denied(int msgId)
     {
-        return;
-        
-        /*
-         * Wait with this, the idea is to deny purchases that kids asks for, but right now much of the flow doesn't work
-         */
-        
         // deny the request, the reserve should be cancelled
         var msg = Msgs.First(x => x.Id == msgId);
-        await NotifyService.DeniedAsync(msgId);
+        Debug.Assert(msg.IdentifierId.HasValue);
+        // TODO: right now this can only handle a Reserve
+        Debug.Assert(msg.Type == MessageType.Buy);
+        await AccountService.CancelReserveAsync(msg.IdentifierId.Value);
+        
+        await NotifyService.DeniedAsync($"Nej till '{msg.Message}", msg.Sender.Id);
     }
 
     protected string GetStatus(MessageModel msg)
@@ -79,7 +85,9 @@ public class MessagesBase : ComponentBase
         return msg switch
         {
             { } when _state.User.Role == RoleEnum.Parent => false, 
+            {Type: MessageType.DeniedBuy } => false,
             { Sender: var sender} when sender.Id != _state.User.Id => true,
+            
             _ => false
         };
     }
@@ -91,6 +99,7 @@ public class MessagesBase : ComponentBase
             {Type: MessageType.DoneTask} 
                 when _state.User.Role == RoleEnum.Parent => true,
             { Sender: var sender } when sender.Id == _state.User.Id => true,
+            {Type: MessageType.DeniedBuy } => true,
             _ => false
         };
     }

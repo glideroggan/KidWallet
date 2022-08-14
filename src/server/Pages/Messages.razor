@@ -11,15 +11,17 @@
     {
         <div class="grid">
             <span><strong>Från</strong></span>
+            <span><strong>Till</strong></span>
             <span><strong>Meddelande</strong></span>
             <span><strong>Val</strong></span>
             <span><strong>Ta bort</strong></span>
             @foreach (var msg in Msgs)
             {
                 <span class="@GetStatus(msg)">@msg.Sender.Name</span>
+                <span class="@GetStatus(msg)">@msg.ToName</span>
                 <span class="@GetStatus(msg)">@msg.Message</span>
                 <span class="button-grid @GetStatus(msg)">
-                    <button class="btn btn-primary" disabled="@IsActionsDisabled(msg)">Ja</button>
+                    <button class="btn btn-primary" disabled="@IsActionsDisabled(msg)" @onclick="@(async () => await Approved(msg.Id))">Ja</button>
                     <button class="btn btn-secondary" disabled="@IsActionsDisabled(msg)" @onclick="@(async () => await Denied(msg.Id))">Nej</button>
                 </span>
                 <span class="@GetStatus(msg)">

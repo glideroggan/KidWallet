@@ -31,7 +31,7 @@ public class PayBase : PageBase
         var reserveId = await AccountService.ReserveMoneyAsync(-Cost, State.User.Id, parentId);
         var msg = new NotifyMessage(MessageType.Buy,
             $"Kan jag köpa '{Description}' för {Cost} SEK?", reserveId);
-        await MessageService.SendMsg(msg);
+        await MessageService.SendMsgAsync(msg);
         NotificationCallback("Skickat");
         // TODO: after actions like this, we should reset the page, so the values are back to default
     }
