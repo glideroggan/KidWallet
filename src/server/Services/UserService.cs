@@ -75,4 +75,24 @@ public class UserService
 
         return children;
     }
+
+    public async Task<int> GetParentAsync(int userId)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var userDto = await _repo.GetAll(dbContext)
+            .Where(u => u.UserId == userId)
+            .FirstOrDefaultAsync();
+        if (userDto == null || userDto.ParentId == null)
+        {
+            throw new UserServiceException("User has no parent, or user doesn't exists");
+        }
+        return userDto.ParentId.Value;
+    }
+}
+
+public class UserServiceException : Exception
+{
+    public UserServiceException(string msg) : base(msg)
+    {
+    }
 }

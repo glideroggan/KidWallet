@@ -85,7 +85,6 @@ public class TaskService
         taskDto.Status = StatusEnum.WaitingForApproval;
         await _repo.UpdateAsync(dbContext, taskDto);
         await _repo.SaveAsync(dbContext);
-        // TODO: we should emit event, so that notification service can notify on them
         await _notifyService.TaskDoneAsync(taskDto.Description, taskId);
         return taskDto.ToModel();
     }

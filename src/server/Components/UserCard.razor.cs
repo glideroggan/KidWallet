@@ -24,6 +24,7 @@ public class UserCardBase : ComponentBase
     {
         switch (State.User.Role)
         {
+            // TODO: fix the pay page, so that children can pay parents
             case RoleEnum.Child when Model.Id == State.User.Id:
                 Nav.NavigateTo("pay");
                 break;
@@ -31,6 +32,12 @@ public class UserCardBase : ComponentBase
                 Nav.NavigateTo($"transfer/{name}");
                 break;
         }
+        return Task.CompletedTask;
+    }
+
+    protected Task SaveMoney(string name)
+    {
+        Nav.NavigateTo($"save/{name}");
         return Task.CompletedTask;
     }
 }

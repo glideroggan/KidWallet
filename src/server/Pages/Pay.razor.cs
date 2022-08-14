@@ -11,7 +11,8 @@ public class PayBase : PageBase
 #pragma warning disable CS8618
     [Inject] private AccountService AccountService { get; set; }
     [Inject] private NotifyService MessageService { get; set; }
-    
+    [Inject] private UserService UserService { get; set; }
+
 #pragma warning restore CS8618
 
     protected int Balance;
@@ -21,20 +22,17 @@ public class PayBase : PageBase
     protected override Task OnInitializedAsyncCallback()
     {
         Balance = State.User.Balance;
-        return OnInitializedAsync();
+        return Task.CompletedTask;
     }
 
     protected async Task Send()
     {
-        return;
-        // TODO: not implemented
-        // TODO: check the inputs so they are ok
-
-        // var reserveId = await AccountService.ReserveMoneyAsync(Cost);
-        // await MessageService.SendMsg(RoleEnum.Parent, 
-        //     $"Kan jag köpa '{Description}' för {Cost} SEK?",
-        //     reserveId: reserveId);
-        //
-        // NotificationCallback("Skickat");
+        var parentId = await UserService.GetParentAsync(State.User.Id);
+        var reserveId = await AccountService.ReserveMoneyAsync(-Cost, State.User.Id, parentId);
+        var msg = new NotifyMessage(MessageType.Buy,
+            $"Kan jag köpa '{Description}' för {Cost} SEK?", reserveId);
+        await MessageService.SendMsg(msg);
+        NotificationCallback("Skickat");
+        // TODO: after actions like this, we should reset the page, so the values are back to default
     }
 }

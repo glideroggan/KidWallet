@@ -20,7 +20,8 @@ public enum NotificationTargetEnum
 public enum MessageType
 {
     None = 0,
-    DoneTask
+    DoneTask,
+    Buy
 }
 
 public record NotifyMessage(MessageType MessageType, string Msg, int Identifier);
@@ -106,11 +107,13 @@ public class NotifyService
 
     public async Task SendMsg(NotifyMessage msg)
     {
+        Debug.Assert(_state.User != null);
         if (_state.User == null) return;
 
         var noteTarget = msg.MessageType switch
         {
             MessageType.DoneTask => NotificationTargetEnum.Parent,
+            MessageType.Buy => NotificationTargetEnum.Parent,
             _ => throw new NotImplementedException("TODO:")
         };
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();

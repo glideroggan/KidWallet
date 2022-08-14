@@ -1,0 +1,12 @@
+﻿@page "/save/{name}"
+@using server.Shared.Components
+@inherits SaveBase
+
+@* TODO: consider adding this page in the side menu *@
+<h3>Save</h3>
+@if (Done)
+{
+    <label for="moneyRange" class="form-label">Pengar</label>
+    <input id="moneyRange" class="form-range"  type="range" min="0" max="@MaxMoney" value="0" step="1" />    
+}
+

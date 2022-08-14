@@ -32,10 +32,41 @@ public class AccountService
         _savingsRepo = savingsRepo;
     }
 
-    public async Task<int> ReserveMoneyAsync(int cost)
+    // TODO: we really need an easy function to call here to get the users balance
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="cost">The amount in a negative value</param>
+    /// <param name="sourceUserId">User Id to draw money from</param>
+    /// <param name="destUserId">User Id that will receive the money</param>
+    /// <returns>Id of reserve row</returns>
+    /// <exception cref="AccountException"></exception>
+    public async Task<int> ReserveMoneyAsync(int cost, int sourceUserId, int destUserId)
     {
-        throw new NotImplementedException();
-        // Wait with this until we have the "kid pay" flow ready
+        // * Check that sender have the money
+        if (_state.Balance < cost)
+        {
+            throw new AccountException("Not enough money");
+        }
+
+        // reserve the money
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var transaction = _spendingRepo.CreateTransaction(dbContext);
+        var reserveDto = await AccountActions.TransferToReserveAsync(dbContext, _reserveRepo, _userRepo, 
+            sourceUserId, destUserId, cost);
+
+        await dbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
+        
+        // update balance for state (depends if the source user is the same as the current user)
+        if (_state.User.Id == sourceUserId)
+        {
+            _state.Balance -= cost;
+        }
+        
+        
+        return reserveDto.ReserveId;
     }
 
     public async Task<List<(string? Name, int Earnings)>> GetEarningsAsync(int weeks)
@@ -106,6 +137,13 @@ public class AccountService
     }
 }
 
+public class AccountException : Exception
+{
+    public AccountException(string msg) : base(msg)
+    {
+    }
+}
+
 public static class AccountActions
 {
     internal static async Task CancelReserveAsync(WalletContext ctx, IRepo<ReserveDto> repo, int reserveId)
@@ -114,6 +152,36 @@ public static class AccountActions
         if (reserve == null) return;
         repo.Remove(ctx, reserve);
         await ctx.SaveChangesAsync();
+    }
+
+    internal static async Task<ReserveDto> TransferToReserveAsync(WalletContext ctx, IRepo<ReserveDto> reserveRepo,
+        IRepo<UserDto> userRepo, int sourceUserId, int destUserId, int amount)
+    {
+        // reduce spending account balance
+        var sourceUser = await userRepo.GetAll(ctx).Include("SpendingAccount")
+            .FirstOrDefaultAsync(a => a.UserId == sourceUserId);
+        var destUser = await userRepo.GetAll(ctx).Include("SpendingAccount")
+            .FirstOrDefaultAsync(a => a.UserId == destUserId);
+        Debug.Assert(sourceUser != null && destUser != null);
+        
+        var sourceSpendingAccountDto = sourceUser.SpendingAccount;
+        var destSpendingAccountDto = destUser.SpendingAccount;
+        Debug.Assert(sourceSpendingAccountDto != null && destSpendingAccountDto != null);
+        
+        sourceSpendingAccountDto.Balance += amount;
+        // add a reserve row
+        var dto = new ReserveDto
+        {
+            Amount = amount,
+            Created = DateTime.UtcNow,
+            Expires = DateTime.UtcNow.AddDays(1),
+            OwnerAccount = sourceSpendingAccountDto,
+            DestAccount = destSpendingAccountDto
+        };
+
+        var model = reserveRepo.Add(ctx, dto);
+        await ctx.SaveChangesAsync();
+        return model;
     }
 
     internal static Task CreateAccountHistory(WalletContext ctx, IRepo<AccountHistoryDto> repo,

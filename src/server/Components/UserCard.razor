@@ -26,10 +26,11 @@
                     </svg>
                     <div>@Model.Balance</div>
                 </div>
-                <div class="icon mx-3">
+                <div class="icon mx-3"
+                    @onclick="@(() => SaveMoney(Model.Name))">
                     <div>Bank</div>
                     <svg class="bi" style="color:#a2708a;" width="32" height="32" fill="currentColor">
-                        <use xlink:href="assets/bootstrap-icons/bootstrap-icons.svg#piggy-bank-fill" />
+                        <use xlink:href="assets/bootstrap-icons/bootstrap-icons.svg#piggy-bank-fill"/>
                     </svg>
                     <div>@Banked</div>
                 </div>
