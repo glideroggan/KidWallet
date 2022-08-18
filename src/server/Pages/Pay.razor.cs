@@ -34,5 +34,9 @@ public class PayBase : PageBase
         await MessageService.SendMsgAsync(msg);
         NotificationCallback("Skickat");
         // TODO: after actions like this, we should reset the page, so the values are back to default
+        
+        
+        // TODO: there will be a balance change after this on the affected account, so we should send out an event
+        // so that pages can update their balances
     }
 }

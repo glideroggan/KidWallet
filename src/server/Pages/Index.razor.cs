@@ -26,7 +26,8 @@ public class IndexBase : ComponentBase, IDisposable
     }
     private void StateChange()
     {
-        InvokeAsync(() => StateHasChanged());
+        // InvokeAsync(UpdateStateAsync);
+        InvokeAsync(StateHasChanged);
     }
     public void Dispose()
     {

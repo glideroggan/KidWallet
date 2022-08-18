@@ -62,7 +62,7 @@ public class AccountService
         // update balance for state (depends if the source user is the same as the current user)
         if (_state.User.Id == sourceUserId)
         {
-            _state.Balance -= cost;
+            _state.Balance += cost;
             _state.NotifyStateChanged();
         }
 
@@ -152,8 +152,8 @@ public class AccountService
         var transaction = _spendingRepo.CreateTransaction(dbContext);
         var reserveDto = await _reserveRepo.GetByIdAsync(dbContext, reserveId);
         Debug.Assert(reserveDto != null);
-        await AccountActions.ExecuteReserveAsync(dbContext,  _reserveRepo, reserveDto.ReserveId);
-        
+        await AccountActions.ExecuteReserveAsync(dbContext, _reserveRepo, reserveDto.ReserveId);
+
         await dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
     }
@@ -176,6 +176,7 @@ public static class AccountActions
             .Include("OwnerAccount")
             .FirstOrDefaultAsync();
         // return money to sender
+        Debug.Assert(reserve != null, nameof(reserve) + " != null");
         var sourceSpendingAccount = reserve.OwnerAccount;
         sourceSpendingAccount.Balance -=
             reserve.Amount; // the amount is negative from the beginning, so returning needs to be positive
@@ -214,7 +215,9 @@ public static class AccountActions
         await ctx.SaveChangesAsync();
         return model;
     }
-    public static async Task ExecuteReserveAsync(WalletContext dbContext, IRepo<ReserveDto> reserveRepo, int reserveDtoReserveId)
+
+    public static async Task ExecuteReserveAsync(WalletContext dbContext, IRepo<ReserveDto> reserveRepo,
+        int reserveDtoReserveId)
     {
         var reserve = await reserveRepo.GetAll(dbContext)
             .Where(x => x.ReserveId == reserveDtoReserveId)
@@ -231,7 +234,7 @@ public static class AccountActions
         destAccount.Balance += funds;
 
         await dbContext.SaveChangesAsync();
-        
+
         // remove reserve
         reserveRepo.Remove(dbContext, reserve);
     }
@@ -332,6 +335,4 @@ public static class AccountActions
 
         await dbContext.SaveChangesAsync();
     }
-
-    
 }

@@ -68,6 +68,12 @@ public class NotifyService
     {
         // TODO: check validation, who can delete what?
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        if (msg.Type == MessageType.Buy)
+        {
+            Debug.Assert(msg.IdentifierId != null, "msg.IdentifierId != null");
+            await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, msg.IdentifierId.Value);
+        }
+        
         switch (msg.Type)
         {
             default:

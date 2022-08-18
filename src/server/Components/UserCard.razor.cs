@@ -16,8 +16,6 @@ public class UserCardBase : ComponentBase
     [Parameter] public int Banked { get; set; }
     
 
-    // TODO: add callback when clicking transfer money method
-
     protected bool CanTransferMoney() => State.User?.Role == RoleEnum.Parent && Model.Role == RoleEnum.Child;
 
     protected Task PayingOrTransferring(string name)

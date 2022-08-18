@@ -6,29 +6,28 @@
 
 @if (State.User == null)
 {
-	// TODO: Make a login page instead of having it as a component
-	<LoginModule Successful="() => UpdateStateAsync()"/>
-} else {
-	<div class="container mx-1">
-		<div class="left-side">
-			<div>
-			<UserCard Model="State.User" />
-		</div>
-		@foreach (var child in Children)
-		{
-			<div>
-				<UserCard Model="child" />
-			</div>
-		}
-		</div>
-
-		<div class="right-side">
-			<server.Components.Widgets.PotentialEarnings Role="State.User.Role"/>
-			<server.Components.Widgets.EarningsLosses Role="State.User.Role" />
-		</div>
-		
-	</div>
+    // TODO: Make a login page instead of having it as a component
+    <LoginModule Successful="() => UpdateStateAsync()"/>
 }
+else
+{
+    <div class="container mx-1">
+        <div class="left-side">
+            <div>
+                <UserCard Model="State.User"/>
+            </div>
+            @foreach (var child in Children)
+            {
+                <div>
+                    <UserCard Model="child"/>
+                </div>
+            }
+        </div>
 
+        <div class="right-side">
+            <server.Components.Widgets.PotentialEarnings Role="State.User.Role"/>
+            <server.Components.Widgets.EarningsLosses Role="State.User.Role"/>
+        </div>
 
-
+    </div>
+}
