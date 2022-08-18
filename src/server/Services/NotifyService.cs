@@ -22,7 +22,8 @@ public enum MessageType
     None = 0,
     DoneTask,
     Buy,
-    DeniedBuy
+    DeniedBuy,
+    ApprovedBuy
 }
 
 public record NotifyMessage(MessageType MessageType, string Msg, int? Identifier=null, int? ReceiverSpecificId=null);
@@ -63,7 +64,7 @@ public class NotifyService
         // await _repo.UpdateAsync(dbContext, note);
     }
 
-    internal async Task RemoveMessage(MessageModel msg)
+    internal async Task RemoveMessageAsync(MessageModel msg)
     {
         // TODO: check validation, who can delete what?
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
@@ -105,6 +106,7 @@ public class NotifyService
             MessageType.DoneTask => NotificationTargetEnum.Parent,
             MessageType.Buy => NotificationTargetEnum.Parent,
             MessageType.DeniedBuy => NotificationTargetEnum.Individual,
+            MessageType.ApprovedBuy => NotificationTargetEnum.Individual,
             _ => throw new NotImplementedException("TODO:")
         };
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
@@ -132,12 +134,26 @@ public class NotifyService
         // can get push updates
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="taskDescription"></param>
+    /// <param name="taskId"></param>
     public async Task TaskDoneAsync(string taskDescription, int taskId)
     {
         /*
          * send message to parent that the task is done and should be checked
          */
         var msg = new NotifyMessage(MessageType.DoneTask, $"I'm done with task '{taskDescription}!", taskId);
+        await SendMsgAsync(msg);
+    }
+
+    public async Task ApproveReservation(int toUserId, string msgStr)
+    {
+        /* 
+         * send message back to child telling that the buy is approved
+         */
+        var msg = new NotifyMessage(MessageType.ApprovedBuy, msgStr, ReceiverSpecificId:toUserId);
         await SendMsgAsync(msg);
     }
 }

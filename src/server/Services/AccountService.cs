@@ -145,6 +145,18 @@ public class AccountService
 
         await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, reserveDto.ReserveId);
     }
+
+    public async Task ExecuteReservationAsync(int reserveId)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var transaction = _spendingRepo.CreateTransaction(dbContext);
+        var reserveDto = await _reserveRepo.GetByIdAsync(dbContext, reserveId);
+        Debug.Assert(reserveDto != null);
+        await AccountActions.ExecuteReserveAsync(dbContext,  _reserveRepo, reserveDto.ReserveId);
+        
+        await dbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
+    }
 }
 
 public class AccountException : Exception
@@ -201,6 +213,27 @@ public static class AccountActions
         var model = reserveRepo.Add(ctx, dto);
         await ctx.SaveChangesAsync();
         return model;
+    }
+    public static async Task ExecuteReserveAsync(WalletContext dbContext, IRepo<ReserveDto> reserveRepo, int reserveDtoReserveId)
+    {
+        var reserve = await reserveRepo.GetAll(dbContext)
+            .Where(x => x.ReserveId == reserveDtoReserveId)
+            .Include("OwnerAccount")
+            .Include("DestAccount")
+            .FirstOrDefaultAsync();
+        Debug.Assert(reserve != null);
+
+        var funds = -reserve.Amount;
+        Debug.Assert(funds > 0);
+        var destAccount = reserve.DestAccount;
+
+        // only add to dest account, as the reservation is already deducted from the source account
+        destAccount.Balance += funds;
+
+        await dbContext.SaveChangesAsync();
+        
+        // remove reserve
+        reserveRepo.Remove(dbContext, reserve);
     }
 
     internal static Task CreateAccountHistory(WalletContext ctx, IRepo<AccountHistoryDto> repo,
@@ -299,4 +332,6 @@ public static class AccountActions
 
         await dbContext.SaveChangesAsync();
     }
+
+    
 }
