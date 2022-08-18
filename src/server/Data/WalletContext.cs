@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Configuration;
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using server.Data.DTOs;
 
 namespace server.Data;
@@ -10,10 +13,10 @@ public class WalletContextFactory : IDesignTimeDbContextFactory<WalletContext>
     {
         var optionsBuilder = new DbContextOptionsBuilder<WalletContext>();
         // https://www.benday.com/2017/02/17/ef-core-migrations-without-hard-coding-a-connection-string-using-idbcontextfactory/
-        //var connection = @"Server=(localdb)\mssqllocaldb;Database=family.time;Trusted_Connection=True;ConnectRetryCount=0";
-        var connection = "";
-        optionsBuilder.UseSqlServer(connection, x => 
-            x.MigrationsAssembly("Migrations"));
+        // var connection = "";
+        // optionsBuilder.UseSqlServer(connection, x => 
+        //     x.MigrationsAssembly("Migrations"));
+        Debug.WriteLine($"Took CreateDbContext");
 
         return new WalletContext(optionsBuilder.Options);
     }
@@ -21,11 +24,11 @@ public class WalletContextFactory : IDesignTimeDbContextFactory<WalletContext>
     public WalletContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<WalletContext>();
-        // TODO: we should hide this away somehow
-        //var connection = @"Server=(localdb)\mssqllocaldb;Database=family.time;Trusted_Connection=True;ConnectRetryCount=0";
-        var connection = "";
+        string connection = "";
         optionsBuilder.UseSqlServer(connection, x => 
-            x.MigrationsAssembly("Migrations"));
+            x.MigrationsAssembly("server"));
+        
+        Debug.WriteLine($"Took CreateDbContext({args})");
 
         return new WalletContext(optionsBuilder.Options);
     }
@@ -34,8 +37,15 @@ public class WalletContext : DbContext
 {
     public WalletContext(DbContextOptions<WalletContext> options) : base(options)
     {
-
     }
+
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     // if (_config == null)
+    //         // optionsBuilder.UseSqlServer(_config.GetConnectionString("Default"), x => 
+    //         //     x.MigrationsAssembly("Migrations"));
+    //     base.OnConfiguring(optionsBuilder);
+    // }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
