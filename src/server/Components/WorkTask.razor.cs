@@ -58,11 +58,13 @@ public class WorkTaskBase : PageBase
         catch (ServiceException e)
         {
             NotificationCallback(e.Message);
-            Waiting = false;
             await OnChange.InvokeAsync();
         }
+        finally
+        {
+            Waiting = false;
+        }
 
-        Waiting = false;
         StateHasChanged();
     }
 
