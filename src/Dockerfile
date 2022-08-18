@@ -10,11 +10,13 @@ WORKDIR /src
 COPY ["server/server.csproj", "server/"]
 RUN dotnet restore "server/server.csproj"
 COPY . .
+
 WORKDIR "/src/server"
 RUN dotnet build "server.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "server.csproj" -c Release -o /app/publish
+RUN #rm ./appsettings.development.json
 
 FROM base AS final
 WORKDIR /app

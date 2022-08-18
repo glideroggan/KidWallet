@@ -14,11 +14,20 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link"  href="/" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
+            @if (Env.IsDevelopment())
+            {
+                <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            }
+            else
+            {
+                <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            }
         </div>
         @*TODO: Should be role*@
         @if (State.User != null)
@@ -34,7 +43,7 @@
                     <NavLink class="nav-link" href="admin">
                         <span class="oi oi-list-rich" aria-hidden="true"></span> Admin
                     </NavLink>
-                </div>    
+                </div>
             }
         }
     </nav>
