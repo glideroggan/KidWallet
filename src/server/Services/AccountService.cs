@@ -45,7 +45,7 @@ public class AccountService
     public async Task<int> ReserveMoneyAsync(int cost, int sourceUserId, int destUserId)
     {
         // * Check that sender have the money
-        if (_state.Balance < cost)
+        if (_state.User.Balance < cost)
         {
             throw new AccountException("Not enough money");
         }
@@ -62,8 +62,7 @@ public class AccountService
         // update balance for state (depends if the source user is the same as the current user)
         if (_state.User.Id == sourceUserId)
         {
-            _state.Balance += cost;
-            _state.NotifyStateChanged();
+            await _state.NotifyStateChanged();
         }
 
 
@@ -180,6 +179,7 @@ public static class AccountActions
         var sourceSpendingAccount = reserve.OwnerAccount;
         sourceSpendingAccount.Balance -=
             reserve.Amount; // the amount is negative from the beginning, so returning needs to be positive
+        
         // delete reserve
         repo.Remove(ctx, reserve);
 

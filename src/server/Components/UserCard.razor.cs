@@ -18,6 +18,12 @@ public class UserCardBase : ComponentBase
 
     protected bool CanTransferMoney() => State.User?.Role == RoleEnum.Parent && Model.Role == RoleEnum.Child;
 
+    // protected override Task OnParametersSetAsync()
+    // {
+    //     StateHasChanged();
+    //     return base.OnParametersSetAsync();
+    // }
+
     protected Task PayingOrTransferring(string name)
     {
         switch (State.User.Role)

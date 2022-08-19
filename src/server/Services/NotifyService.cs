@@ -72,6 +72,7 @@ public class NotifyService
         {
             Debug.Assert(msg.IdentifierId != null, "msg.IdentifierId != null");
             await AccountActions.CancelReserveAsync(dbContext, _reserveRepo, msg.IdentifierId.Value);
+            await _state.NotifyStateChanged();
         }
         
         switch (msg.Type)

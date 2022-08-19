@@ -48,8 +48,7 @@ namespace server.Services
             if (user != null)
             {
                 _appState.User = user;
-                _appState.Balance = user.Balance;
-                _appState.NotifyStateChanged();
+                await _appState.NotifyStateChanged();
             }
 
             return (valid, token);
@@ -220,8 +219,7 @@ namespace server.Services
                     var userName = jwtToken.Claims.First(x => x.Type == "Name").Value;
                     var user = await _userService.GetUserAsync(userName);
                     _appState.User = user;
-                    _appState.Balance = user.Balance;
-                    _appState.NotifyStateChanged();
+                    await _appState.NotifyStateChanged();
                     
                     // TODO: check that the token is of the server version
                     // otherwise we need to log you in again and update your token
