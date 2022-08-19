@@ -25,7 +25,7 @@ public class TopMenuContextOptionsBase : ComponentBase, IDisposable
             return;
         }
         
-        var page = uri.Segments[1];
+        var page = uri.Segments[^1];
         Links = NavContextService.GetMenuItems(page);
         StateHasChanged();
     }
