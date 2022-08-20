@@ -7,6 +7,7 @@ public class SaveBase : PageBase
 {
     [Parameter] public string? Name { get; set; }
     [Inject] private UserService UserService { get; set; }
+    [Inject] private AccountService AccountService { get; set; }
 
     protected int MaxMoney { get; set; }
     protected int SliderMoney { get; set; }
@@ -26,7 +27,10 @@ public class SaveBase : PageBase
 
     protected async Task Save()
     {
-        throw new NotImplementedException();
+        // TODO: validate inputs?
+        
+        await AccountService.TransferToSavingsAsync(SliderMoney, Projection, DateTime.UtcNow.AddDays(Days));
+        NotificationCallback("Sparat");
     }
 
     protected void ValidateDays(string val)

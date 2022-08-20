@@ -156,6 +156,51 @@ public class AccountService
         await dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
     }
+
+    public async Task TransferToSavingsAsync(int amount, int projectedAmount, DateTime releaseDate)
+    {
+        /* 
+         * validations
+         *      check that we have the amount in spending account
+         * create a row in savings account with the amount
+         * reduce the amount from spending account
+         */
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var transaction = _spendingRepo.CreateTransaction(dbContext);
+        
+        // validate
+        var user = await _userRepo.GetAll(dbContext).Where(x => x.UserId == _state.User.Id)
+            .Include("SpendingAccount")
+            .FirstOrDefaultAsync();
+        var spendingAccount = user.SpendingAccount;
+        if (spendingAccount.Balance < amount)
+        {
+            throw new AccountException("Not enough money");
+        }
+        if (releaseDate < DateTime.Now)
+        {
+            throw new AccountException("Release date must be in the future");
+        }
+        
+        // savings account
+        var savingsData = new SavingAccountDto()
+        {
+            User = user,
+            CalculatedFunds = projectedAmount,
+            DepositFunds = amount,
+            ReleaseDate = releaseDate,
+            UserId = user.UserId,
+        };
+        _savingsRepo.Add(dbContext, savingsData);
+        
+        // reduce
+        spendingAccount.Balance -= amount;
+        
+        await dbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
+        
+        await _state.NotifyStateChanged();
+    }
 }
 
 public class AccountException : Exception
