@@ -6,7 +6,26 @@
 <h3>Save</h3>
 @if (Done)
 {
+    @* @bind:event="oninput" *@
+    @* @bind="@SliderMoney" *@
+    @* @bind-value:event="oninput" *@
     <label for="moneyRange" class="form-label">Pengar</label>
-    <input id="moneyRange" class="form-range"  type="range" min="0" max="@MaxMoney" value="0" step="1" />    
+    <input id="moneyRange" class="form-range"  type="range" 
+           value="@SliderMoney"
+           @oninput="(val => SliderMoney = Calculate(val.Value.ToString()))"
+           
+           min="0" max="@MaxMoney" step="1" />
+    <h2>Kvar i plånboken: @MoneyLeftInWallet</h2>
+    <h3>Till spargrisen @SliderMoney => @Projection</h3>
+    
+    <div>
+    <label for="days" class="form-label">Dagar</label>
+        <input id="days" type="number" min="1" max="100" step="1" value="@Days"
+               @onchange="val => ValidateDays(val.Value.ToString())"/>    
+    </div>
+    
+    
+    
+    <button class="btn-primary" onclick="@Save">Spara</button>
 }
 
