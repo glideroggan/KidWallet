@@ -13,7 +13,6 @@ public class UserCardBase : ComponentBase
     [Inject] public AppState State { get; set; } = null!;
     [Inject] protected NavigationManager Nav { get; set; }
     [Parameter] public UserModel Model { get; set; } = null!;
-    [Parameter] public int Banked { get; set; }
     
 
     protected bool CanTransferMoney() => State.User?.Role == RoleEnum.Parent && Model.Role == RoleEnum.Child;
