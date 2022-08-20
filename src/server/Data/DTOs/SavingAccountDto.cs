@@ -5,6 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace server.Data.DTOs;
 
+public static class SavingAccountExtensions
+{
+    public static SavingAccountRowModel ToModel(this SavingAccountDto s) => new(s.CalculatedFunds, s.ReleaseDate);
+}
+
 public class SavingAccountDto
 {
     [Key]

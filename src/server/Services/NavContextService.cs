@@ -14,7 +14,7 @@ namespace server.Services
              * Feels like we need to register the pages already here, as the pages will be created first when used
              * and location changed event will happen before
              */
-            RegisterPage("tasks", ("assets/bootstrap-icons/bootstrap-icons.svg#plus-circle-fill", "/CreateTask", RoleEnum.Parent));
+            RegisterPage("tasks", ("assets/bootstrap-icons/bootstrap-icons.svg#plus-circle-fill", "CreateTask", RoleEnum.Parent));
             // TODO: put in a more suitable icon
             RegisterPage("admin", ("assets/bootstrap-icons/bootstrap-icons.svg#plus-circle-fill", "/achievements", RoleEnum.Parent));
         }

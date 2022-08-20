@@ -1,0 +1,39 @@
+﻿@using server.Data.User
+@using server.Services
+@namespace server.Components.Widgets
+
+@if (Role == RoleEnum.Child)
+{
+    <WidgetTemplate>
+        <div>Nästa betalning från banken</div>
+        @if (Date != default)
+        {
+            <div class="table">
+                <span class="amount">@Amount SEK</span>
+                <span class="date">@Date.ToShortDateString()</span>
+            </div>    
+        }
+        
+    </WidgetTemplate>
+}
+
+@code {
+    [Parameter] public RoleEnum Role { get; set; }
+    [Inject] private AppState State { get; set; }
+    [Inject] private AccountService AccountService { get; set; }
+
+    private DateTime Date;
+    private decimal Amount;
+    protected override async Task OnInitializedAsync()
+    {
+        // get next payment date
+        var savings = await AccountService.GetSavingsAsync(State.User.Id);
+        var firstPayout = savings.FirstOrDefault();
+        if (firstPayout != null)
+        {
+            Date = firstPayout.ReleaseDate;
+            Amount = firstPayout.CalculatedFunds;
+        }
+    }
+
+}

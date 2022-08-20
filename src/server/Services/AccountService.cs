@@ -201,6 +201,18 @@ public class AccountService
         
         await _state.NotifyStateChanged();
     }
+
+    public async Task<List<SavingAccountRowModel>> GetSavingsAsync(int userId)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var savings = await _savingsRepo.GetAll(dbContext)
+            .Where(x => x.UserId == userId)
+            .OrderBy(x => x.ReleaseDate)
+            .Select(x => x.ToModel())
+            .ToListAsync();
+
+        return savings;
+    }
 }
 
 public class AccountException : Exception

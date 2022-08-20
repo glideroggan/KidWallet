@@ -1,6 +1,7 @@
 ﻿@page "/"
 @page "/home"
 @inherits IndexBase;
+@using server.Components.Widgets;
 
 <PageTitle>Index</PageTitle>
 
@@ -25,8 +26,10 @@ else
         </div>
 
         <div class="right-side">
-            <server.Components.Widgets.PotentialEarnings Role="State.User.Role"/>
-            <server.Components.Widgets.EarningsLosses Role="State.User.Role"/>
+            <PotentialEarnings Role="State.User.Role"/>
+            <EarningsLosses Role="State.User.Role"/>
+            <Payouts Role="State.User.Role"/>
+            
         </div>
 
     </div>
