@@ -16,15 +16,14 @@ public class TopMenuContextOptionsBase : ComponentBase, IDisposable
 
     private void LocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        
         var uri = new Uri(NavManager.Uri);
         if (uri.Segments.Length == 1)
         {
             Links?.Clear();
-            StateHasChanged();    
+            StateHasChanged();
             return;
         }
-        
+
         var page = uri.Segments[^1];
         Links = NavContextService.GetMenuItems(page);
         StateHasChanged();
@@ -37,6 +36,7 @@ public class TopMenuContextOptionsBase : ComponentBase, IDisposable
             NavManager.LocationChanged += LocationChanged;
         }
     }
+
     public void Dispose()
     {
         NavManager.LocationChanged -= LocationChanged;

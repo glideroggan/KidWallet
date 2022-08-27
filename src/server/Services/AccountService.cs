@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Data.DTOs;
@@ -204,6 +206,7 @@ public class AccountService
 
     public async Task<List<SavingAccountRowModel>> GetSavingsAsync(int userId)
     {
+        await DoOutstandingTransfersAsync(); 
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var savings = await _savingsRepo.GetAll(dbContext)
             .Where(x => x.UserId == userId)
@@ -212,6 +215,27 @@ public class AccountService
             .ToListAsync();
 
         return savings;
+    }
+
+    private async Task DoOutstandingTransfersAsync()
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var transaction = _spendingRepo.CreateTransaction(dbContext);
+        var outstandingTransfers = await _savingsRepo.GetAll(dbContext)
+            .Where(x => x.ReleaseDate <= DateTime.UtcNow)
+            .Include(x => x.User).ThenInclude(x => x.SpendingAccount)
+            .ToListAsync();
+        if (outstandingTransfers.Count == 0) return;
+
+        foreach (var savingAccountDto in outstandingTransfers)
+        {
+            Debug.Assert(savingAccountDto.User.SpendingAccount != null);
+            AccountActions.TransferFromSavingsAsync(dbContext, _savingsRepo, 
+                savingAccountDto, savingAccountDto.User.SpendingAccount);
+        }
+        
+        await dbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
     }
 }
 
@@ -391,5 +415,17 @@ public static class AccountActions
         destAccount.Balance += funds;
 
         await dbContext.SaveChangesAsync();
+    }
+
+    public static void TransferFromSavingsAsync(WalletContext dbContext, IRepo<SavingAccountDto> savingsRepo, 
+        SavingAccountDto fromAccount,
+        SpendingAccountDto toAccount)
+    {
+        // TODO: should this be in history?
+        
+        var amount = fromAccount.CalculatedFunds;
+        toAccount.Balance += amount;
+        
+        savingsRepo.Remove(dbContext, fromAccount);
     }
 }
