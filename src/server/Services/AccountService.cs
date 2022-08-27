@@ -236,6 +236,8 @@ public class AccountService
         
         await dbContext.SaveChangesAsync();
         await transaction.CommitAsync();
+
+        await _state.NotifyStateChanged();
     }
 }
 
